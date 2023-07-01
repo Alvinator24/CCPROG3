@@ -135,8 +135,43 @@ public class VendingMachine {
 
     }
 
-    public void printTransaction() {
-        currentTransaction.displayTransaction();
+    public void displayTransaction() {
+        double totalPrice = 0;
+        double totalCalories = 0;
+        int index = 0;
+
+        for(Item item: currentTransaction.getCartedItems()){
+            ++index;
+            double itemPrice = item.getPrice();
+            double itemCalories = item.getCalories();
+
+
+            totalPrice += itemPrice;
+            totalCalories += itemCalories;
+            System.out.println("["+index+ "]" + item.getItemName() + "(" + itemCalories + " cals)");
+            System.out.println(itemPrice);
+        }
+
+        System.out.println("----------------");
+        System.out.println("Total Price: " + totalPrice + " | Total Calories : " + totalCalories);
+
+        System.out.println("Amount inserted: " + currentTransaction.getTotalDispensed());
+        if(currentTransaction.getTotalDispensed() >= totalPrice){
+            //print change
+            coinBank.checkout()
+
+            //check if change is possible
+            //if so let user know
+
+        }
+
+    }
+
+    public boolean haveChange(){ //FINISH
+        boolean enoughChange = false;
+
+
+        return enoughChange;
     }
 
 
@@ -154,7 +189,13 @@ public class VendingMachine {
             change.put(s, 0);
         }
 
-        if(coinBank.dispenseCoin(currentTransaction, change));
+        if(coinBank.dispenseCoin(currentTransaction, change,1)){
+            System.out.println("Thank you for your purchase!");
+            System.out.println()
+        }
+        else{
+
+        }
 
     }
 

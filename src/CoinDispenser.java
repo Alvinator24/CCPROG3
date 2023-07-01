@@ -38,7 +38,7 @@ public class CoinDispenser {
         dispenseCoin(getDenom(coin));
     }
 
-    public boolean dispenseCoin(Transaction transaction, HashMap<Denomination, Integer> changeReturned){
+    public boolean checkout(Transaction transaction, HashMap<Denomination, Integer> changeReturned, boolean pushThrough){
         boolean enoughChange = false;
         double remainingChange = transaction.getTotalDispensed();
 
@@ -49,7 +49,10 @@ public class CoinDispenser {
             int numOfCoins = (int) (remainingChange / denom.getValue());
             if (numOfCoins > tempCoinCollection.get(denom)) {
                 numOfCoins = tempCoinCollection.get(denom);
+
             }
+            tempCoinCollection.put(denom, tempCoinCollection.get(denom) - numOfCoins);
+            changeReturned.put(denom, changeReturned.get(denom) + numOfCoins);
 
             remainingChange -= numOfCoins * denom.getValue();
             if(remainingChange == 0){
@@ -59,6 +62,9 @@ public class CoinDispenser {
             else if(remainingChange < 0){
                 break;
             }
+        }
+        if(pushThrough && enoughChange){
+            coinCollection = tempCoinCollection;
         }
 
 

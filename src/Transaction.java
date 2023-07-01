@@ -63,36 +63,7 @@ public class Transaction {
 
 
 
-    public void displayTransaction() {
-        double totalPrice = 0;
-        double totalCalories = 0;
-        int index = 0;
 
-        for(Item item: cartedItems){
-            ++index;
-            double itemPrice = item.getPrice();
-            double itemCalories = item.getCalories();
-
-
-            totalPrice += itemPrice;
-            totalCalories += itemCalories;
-            System.out.println("["+index+ "]" + item.getItemName() + "(" + itemCalories + " cals)");
-            System.out.println(itemPrice);
-        }
-
-        System.out.println("----------------");
-        System.out.println("Total Price: " + totalPrice + " | Total Calories : " + totalCalories);
-
-        System.out.println("Amount inserted: " + totalDispensed);
-        if(totalDispensed >= totalPrice){
-            //print change
-
-            //check if change is possible
-            //if so let user know
-
-        }
-
-    }
 
     public double getTotalDispensed(){
         return totalDispensed;
@@ -100,6 +71,10 @@ public class Transaction {
 
     public HashMap<Denomination, Integer> getCoinCollection(){
         return coinCollection;
+    }
+
+    public ArrayList<Item> getCartedItems(){
+        return cartedItems;
     }
 
 }
