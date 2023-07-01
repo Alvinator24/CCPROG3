@@ -83,8 +83,8 @@ public class VendingMachine {
         return isSuccessful;
     }
 
-    public void restockCash(ArrayList<Denomination> cash) {
-        
+    public void restockCash(double cash) {
+        coinBank.dispenseCoin(cash);
     }
 
     public boolean removeItem(int slotNum) { //change to private (make maintenance method w password)
@@ -277,13 +277,16 @@ public class VendingMachine {
                 }
 
                 case 2: {
-                    
+
 
                     break;
                 }
 
                 case 3: {
+                    System.out.println("Enter Denomination Value: ");
+                    double myObj5 =  myObj.nextDouble();
 
+                    dispenseCoin(myObj5);
 
                     break;
                 }
@@ -295,7 +298,7 @@ public class VendingMachine {
             }
         }
         else{
-            System.out.println("Invalid Password")
+            System.out.println("Invalid Password");
         }
     }
 
