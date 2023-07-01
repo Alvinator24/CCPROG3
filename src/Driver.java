@@ -23,15 +23,15 @@ public class Driver {
         denoms.add(new Denomination(500));
         denoms.add(new Denomination(1000));
 
+        System.out.println("1. Create RVM");
+        System.out.println("2. Create SVM");
+        System.out.println("3. Exit");
+        
         Scanner sc = new Scanner(System.in);
         int choice = sc.nextInt();
 
 
         while(choice != 3) {
-            System.out.println("1. Create RVM");
-            System.out.println("2. Create SVM");
-            System.out.println("3. Exit");
-
             if(choice == 1) {
                 VendingMachine test = new VendingMachine("test", 10,10, denoms );
 
