@@ -9,7 +9,7 @@ public class CoinDispenser {
         this.denomList = denomList;
 
         for(Denomination denom : this.denomList){
-            coinCollection.put(denom, 0);
+            coinCollection.put(denom, 10); //our factory arbitrarily provides the vending machines with 10 coins
         }
 
     }
@@ -29,27 +29,24 @@ public class CoinDispenser {
 
 
     // adds coins to the machine
-    public float dispenseCoin(denom){
-
-        
-    
+    public void dispenseCoin(Denomination denom){
+        int coinCount = coinCollection.get(denom) + 1;
+        coinCollection.put(denom, coinCount);
     }
 
-    public float dispenseCoin(double){
-
-        
-    
+    public void dispenseCoin(double coin){
+        dispenseCoin(getDenom(coin));
     }
 
-    public float dispenseCoin(transaction){
+    public float dispenseCoin(Transaction transaction){
 
         
-    
+        return 0;
     }
 
     // removes coins to the machine
     public float removeCoin() {
-
+        return 0;
     }
 
 }

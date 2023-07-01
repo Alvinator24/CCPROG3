@@ -7,14 +7,14 @@ public class VendingMachine {
     private int itemLimit;
     private double totalAmount; // hashmap instead ?
 
-    private Transaction currentTransaction; //
+    Transaction currentTransaction; //
 
     private ArrayList<Slot> itemSlots;
     private ArrayList<Denomination> denom;
 
     // TODO: MAKE SURE DRIVER CODE DOES NOT PASS LESS THAN MINIMUM NUMBER OF SLOTS
     // AND ITEMS
-    VendingMachine(String name, int slotLimit, int itemLimit) {
+    VendingMachine(String name, int slotLimit, int itemLimit, ArrayList<Denomination> denoms) {
         this.name = name;
         this.slotLimit = slotLimit;
         this.itemLimit = itemLimit;
@@ -59,27 +59,40 @@ public class VendingMachine {
     }
 
     public Slot getSlot(Item item) {
+        Slot slot = null;
         for (Slot i: itemSlots) {
-            if(i.getItem().getItemName() == item.getItemName() && i.getItem().getPrice() == item.getPrice() && i.getItem().getCalories() == item.getCalories()) {
-                return i;
+            if(i.getItem().getItemName().equals(item.getItemName()) && i.getItem().getPrice() == item.getPrice() && i.getItem().getCalories() == item.getCalories()) {
+                slot = i;
             }
         }
+        return slot;
     }
 
-    }
 
-    public int purchaseItem(int slotNum) {
-        if( < ) {
-           return; 
+
+    public boolean purchaseItem(int slotNum) {
+        boolean success = false;
+        if(slotNum < itemSlots.size()) {
+
+            Item item = itemSlots.get(slotNum-1).getItem();
+            int itemsWanted = currentTransaction.getItemQuantity(item) + 1;
+            if(getAvailability(item, itemsWanted)){
+                System.out.println("yes");
+                currentTransaction.addItem(item);
+                success = true;
+            }
         }
+        return success;
+
     }
 
-    public boolean getTransactionStatus() {
-        return currentTransaction.isEmpty;
+    public void printTransaction() {
+        currentTransaction.displayTransaction();
     }
+
 
     public void newTransaction(){
-        currentTransaction = new Transaction();
+        currentTransaction = new Transaction(denom);
     }
 
     public void addCash(int test) {
@@ -92,6 +105,16 @@ public class VendingMachine {
 
     public void displayItems() {
         // return 2d array, or hashmap (name: key, price: value)
+    }
+
+    public boolean getAvailability(Item item, int numberOfOrders) {
+        boolean available = false;
+        System.out.println(getSlot(item).getQuantity());
+        if(getSlot(item).getQuantity() >= numberOfOrders) {
+            System.out.println(getSlot(item).getQuantity());
+            available = true;
+        }
+        return available;
     }
 
 }
