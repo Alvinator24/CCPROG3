@@ -54,14 +54,17 @@ public class Driver {
         test.purchaseItem(1);
         test.purchaseItem(1);
         test.purchaseItem(2);
+        test.purchaseItem(3);
 
-        test.currentTransaction.removeItem(3);
+        //test.currentTransaction.removeItem(3);
 
         test.dispenseCoin(20);
         test.dispenseCoin(1);
-        test.dispenseCoin(.25);
-        test.currentTransaction.displayTransaction();
+        test.dispenseCoin(1000);
 
+        test.displayTransaction();
+
+        test.checkout(true);
 
         //test.displayItems();
         //System.out.println(test.currentTransaction.cartedItems.get(0).getItemName());

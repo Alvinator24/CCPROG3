@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.Scanner;
 
 public class VendingMachine {
 
@@ -21,7 +22,7 @@ public class VendingMachine {
         this.itemLimit = itemLimit;
         password = "admin";
         itemSlots = new ArrayList<Slot>();
-        coinBank = new CoinDispenser(denom);
+        coinBank = new CoinDispenser(denoms);
         
         denom = denoms;
 
@@ -37,7 +38,7 @@ public class VendingMachine {
         this.itemLimit = itemLimit;
         this.password = password;
         itemSlots = new ArrayList<Slot>();
-        coinBank = new CoinDispenser(denom);
+        coinBank = new CoinDispenser(denoms);
 
         denom = new ArrayList<Denomination>();
 
@@ -67,7 +68,6 @@ public class VendingMachine {
     // make it static (list of slots, since irl u dont change it once it's made)
     // get the index from the user (n - 1, since it starts from 0)
     
-    // if restockAmount is negative, it means remove
     public boolean restockItem(Item item) {
         boolean isSuccessful =  false;
         Slot found = getSlot(item);
@@ -135,10 +135,16 @@ public class VendingMachine {
 
     }
 
-    public void displayTransaction() {
-        double totalPrice = 0;
-        double totalCalories = 0;
+    public boolean displayTransaction() {
+        double change = 0;
+        boolean readyForCheckout = false;
         int index = 0;
+
+        HashMap<Denomination, Integer> projectedChange = new HashMap<Denomination, Integer>();
+        for(Denomination s : denom){
+            projectedChange.put(s, 0);
+        }
+
 
         for(Item item: currentTransaction.getCartedItems()){
             ++index;
@@ -146,25 +152,28 @@ public class VendingMachine {
             double itemCalories = item.getCalories();
 
 
-            totalPrice += itemPrice;
-            totalCalories += itemCalories;
             System.out.println("["+index+ "]" + item.getItemName() + "(" + itemCalories + " cals)");
             System.out.println(itemPrice);
         }
 
         System.out.println("----------------");
-        System.out.println("Total Price: " + totalPrice + " | Total Calories : " + totalCalories);
+        System.out.println("Total Price: " + currentTransaction.getTotalPrice() + " | Total Calories : " + currentTransaction.getTotalCalories());
 
         System.out.println("Amount inserted: " + currentTransaction.getTotalDispensed());
-        if(currentTransaction.getTotalDispensed() >= totalPrice){
+        if(currentTransaction.getTotalDispensed() >= currentTransaction.getTotalPrice()) {
             //print change
-            coinBank.checkout()
+            if (coinBank.checkout(currentTransaction, projectedChange, false)) ;
+            {
+                readyForCheckout = true;
+                for (Denomination s : denom) {
+                    change += projectedChange.get(s) * s.getValue();
+                }
 
-            //check if change is possible
-            //if so let user know
+                System.out.println("Change: " + change);
 
+            }
         }
-
+        return readyForCheckout;
     }
 
     public boolean haveChange(){ //FINISH
@@ -189,13 +198,32 @@ public class VendingMachine {
             change.put(s, 0);
         }
 
-        if(coinBank.dispenseCoin(currentTransaction, change,1)){
-            System.out.println("Thank you for your purchase!");
-            System.out.println()
-        }
-        else{
+        if(followThrough){
+            if(coinBank.checkout(currentTransaction, change,true)){
 
+                System.out.println("\n\nThank you for your purchase!");
+                System.out.println("===================");
+                System.out.println("Summary of purchase");
+                for(Item item : currentTransaction.getCartedItems()){
+                    System.out.println("Item: " + item.getItemName());
+                    System.out.println("Price: " + item.getPrice());
+                    System.out.println("Calories: " + item.getCalories());
+                    System.out.println("-------------------");
+                }
+                System.out.println("===================");
+                System.out.println("Total Price: " + currentTransaction.getTotalPrice() + " | Total Calories: " + currentTransaction.getTotalCalories());
+
+                System.out.println("\n\n*Change given*");
+                for(Denomination s : denom){
+                    System.out.println(s.getValue() + " : " + change.get(s));
+                }
+            }
+            else{
+                System.out.println("Error dispensing change | maybe called when displayTransaction() returned false");
+            }
         }
+        System.out.println("Thank you!\n");
+        newTransaction();
 
     }
 
@@ -213,8 +241,6 @@ public class VendingMachine {
             System.out.println("Price: " + price);
             System.out.println("Calories: " + calories);
             System.out.println("Available: |" + s.getQuantity() + "|");
-
-
         }
     }
 
@@ -227,7 +253,50 @@ public class VendingMachine {
     }
 
     public void maintenance(String password){
+        Scanner myObj = new Scanner(System.in);  // Create a Scanner object
 
+
+        if(password.equals(this.password)){
+            System.out.println("[1] Restock\n [2] Print Summary\n [3] Refill Denominations\n [4] Withdraw Cash");
+            int choice = myObj.nextInt();
+
+            switch(choice){
+                case 1: {
+
+                    System.out.println("Enter item name: ");
+                    String myObj2 =  myObj.nextLine();
+
+                    System.out.println("Enter price: ");
+                    double myObj3 =  myObj.nextDouble();
+
+                    System.out.println("Enter Calories: ");
+                    double myObj4 =  myObj.nextDouble();
+
+                    restockItem(new Item(myObj2, myObj3, myObj4));
+                    break;
+                }
+
+                case 2: {
+                    
+
+                    break;
+                }
+
+                case 3: {
+
+
+                    break;
+                }
+
+                case 4: {
+
+                    break;
+                }
+            }
+        }
+        else{
+            System.out.println("Invalid Password")
+        }
     }
 
 }
