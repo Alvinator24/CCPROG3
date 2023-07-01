@@ -5,9 +5,10 @@ public class VendingMachine {
     private String name;
     private int slotLimit;
     private int itemLimit;
-    private double totalAmount; // hashmap instead ?
+    private String password;
+    Transaction currentTransaction; //make private
 
-    Transaction currentTransaction; //
+    CoinDispenser coinBank;
 
     private ArrayList<Slot> itemSlots;
     private ArrayList<Denomination> denom;
@@ -18,9 +19,11 @@ public class VendingMachine {
         this.name = name;
         this.slotLimit = slotLimit;
         this.itemLimit = itemLimit;
+        password = "admin";
         itemSlots = new ArrayList<Slot>();
+        coinBank = new CoinDispenser(denom);
         
-        denom = new ArrayList<Denomination>();
+        denom = denoms;
 
         
         // TODO: initialize denomm
@@ -28,14 +31,35 @@ public class VendingMachine {
         newTransaction();
     }
 
-    public boolean addItem(Item item) { 
-        boolean isSuccessul = false; 
+    VendingMachine(String name, int slotLimit, int itemLimit, ArrayList<Denomination> denoms, String password) {
+        this.name = name;
+        this.slotLimit = slotLimit;
+        this.itemLimit = itemLimit;
+        this.password = password;
+        itemSlots = new ArrayList<Slot>();
+        coinBank = new CoinDispenser(denom);
 
-       if(itemSlots.size() < slotLimit){
-            Slot slot = new Slot(item, itemLimit);
-            itemSlots.add(slot);
-            isSuccessul = true;
+        denom = new ArrayList<Denomination>();
+
+        newTransaction();
+    }
+
+    public boolean addItem(Item item) { 
+        boolean isSuccessul = false;
+        Slot found = getSlot(item);
+
+       if(found == null){
+           if(itemSlots.size() < slotLimit){
+               Slot slot = new Slot(item, itemLimit);
+               itemSlots.add(slot);
+               isSuccessul = true;
+
+           }
        }
+       else{
+           System.out.println("Slot for item already exists");
+       }
+
 
         return isSuccessul;
     }
@@ -46,16 +70,36 @@ public class VendingMachine {
     // if restockAmount is negative, it means remove
     public boolean restockItem(Item item) {
         boolean isSuccessful =  false;
-        getSlot(item).addItem(item);
+        Slot found = getSlot(item);
+        if(found != null){
+            if(found.getQuantity() < itemLimit){
+                found.addItem(item);
+            }
+         isSuccessful = true;
+        }
+        else{
+            System.out.println("Item isn't registered into vending machine");
+        }
         return isSuccessful;
     }
 
-    public void restockCash() {
+    public void restockCash(ArrayList<Denomination> cash) {
         
     }
 
-    public void removeItem(Item item) {
-        getSlot(item).removeItem();
+    public boolean removeItem(int slotNum) { //change to private (make maintenance method w password)
+        boolean isSuccesful = false;
+        --slotNum;
+        Slot slot = itemSlots.get(slotNum);
+        if(slot.getQuantity() == 0){
+            System.out.println("Slot already empty");
+
+        }
+        else{
+            slot.removeItem();
+            isSuccesful = true;
+        }
+        return  isSuccesful;
     }
 
     public Slot getSlot(Item item) {
@@ -77,12 +121,17 @@ public class VendingMachine {
             Item item = itemSlots.get(slotNum-1).getItem();
             int itemsWanted = currentTransaction.getItemQuantity(item) + 1;
             if(getAvailability(item, itemsWanted)){
-                System.out.println("yes");
                 currentTransaction.addItem(item);
                 success = true;
             }
         }
         return success;
+
+    }
+
+
+    public boolean dispenseCoin(double valueInserted){
+        return currentTransaction.dispenseCoin(valueInserted);
 
     }
 
@@ -100,21 +149,44 @@ public class VendingMachine {
     }
 
     public void checkout(boolean followThrough){
+        HashMap<Denomination, Integer> change = new HashMap<Denomination, Integer>();
+        for(Denomination s : denom){
+            change.put(s, 0);
+        }
+
+        if(coinBank.dispenseCoin(currentTransaction, change));
 
     }
 
     public void displayItems() {
-        // return 2d array, or hashmap (name: key, price: value)
+        int slotNum = 0;
+        for(Slot s : itemSlots){
+            ++slotNum;
+            String name = s.getItem().getItemName();
+            double price = s.getItem().getPrice();
+            double calories = s.getItem().getCalories();
+
+            System.out.println("------------------");
+            System.out.println("Slot " + slotNum);
+            System.out.println("Item: " + name);
+            System.out.println("Price: " + price);
+            System.out.println("Calories: " + calories);
+            System.out.println("Available: |" + s.getQuantity() + "|");
+
+
+        }
     }
 
     public boolean getAvailability(Item item, int numberOfOrders) {
         boolean available = false;
-        System.out.println(getSlot(item).getQuantity());
         if(getSlot(item).getQuantity() >= numberOfOrders) {
-            System.out.println(getSlot(item).getQuantity());
             available = true;
         }
         return available;
+    }
+
+    public void maintenance(String password){
+
     }
 
 }
