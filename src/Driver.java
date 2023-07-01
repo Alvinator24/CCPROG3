@@ -9,52 +9,63 @@ public class Driver {
     // we only need to store the data (vending machines), so ArrayList is optimal
     // if we needed to manipulate the data, LinkedLists are better (internally doubly linked lists)
 
-    public static void homepage() {
-
-        System.out.println("===== Vending Machine Factory =====");
-        System.out.println("1. Create a Regular Vending Machine");
-        System.out.println("2. Create a Special Vending Machine");
-        System.out.println("3. Exit");
-
-    }
-
-    ArrayList<VendingMachine> vendingMachineList = new ArrayList<VendingMachine>();
-    // make two separate classes, rvc and svc
-
     public static void main(String[] args) {
-
-        homepage();
-
-        Scanner sc = new Scanner(System.in);
-
-        int choice = sc.nextInt();
-
-        sc.close();
-
-        // MVC architecture
-        // error checking (controller)
-
-        switch(choice) {
-            
-            case 1:
-                vendingMachineList.add(new VendingMachine("Vending1", 8, 10));
-                // make an arraylist of vendingmachine objects
-                // new obj then add.
-                // use MVC here
-                // controller is like a gate
-                // VendingMachine vendingMachine = new VendingMachine(null, choice, choice);
-                // ask user how many slots, then instantiate slot classes
-                // ask user how many items each slot
-                // create a new VendingMachine object (will all its non-customizable features) and store it in the ArrayList
-                // once the vending machine is done building, allow the customer to buy stuff from it
-            case 2:
-
-            case 3:
-                homepage();
-
-        }
+        ArrayList<Denomination> denoms = new ArrayList<Denomination>();
+        denoms.add(new Denomination(.01));
+        denoms.add(new Denomination(.05));
+        denoms.add(new Denomination(.1));
+        denoms.add(new Denomination(.25));
+        denoms.add(new Denomination(1));
+        denoms.add(new Denomination(5));
+        denoms.add(new Denomination(10));
+        denoms.add(new Denomination(20));
+        denoms.add(new Denomination(50));
+        denoms.add(new Denomination(100));
+        denoms.add(new Denomination(200));
+        denoms.add(new Denomination(500));
+        denoms.add(new Denomination(1000));
 
 
+
+
+
+        VendingMachine test = new VendingMachine("test", 10,10, denoms );
+
+        Item iceTea = new Item("IceTea", 65, 300);
+        Item orangeJuice = new Item("Orangey", 165, 3300);
+        Item appleJuice = new Item("Appley", 101, 250);
+        Item iceTea2 = new Item("IceTea", 65, 300);
+
+        test.addItem(iceTea);
+        test.addItem(orangeJuice);
+        test.addItem(appleJuice);
+
+        test.restockItem(new Item("IceTea", 65, 300));
+        test.restockItem(new Item("IceTea", 65, 300));
+        test.restockItem(new Item("IceTea", 65, 300));
+        test.restockItem(new Item("IceTea", 65, 300));
+        test.restockItem(new Item("IceTea", 65, 300));
+        test.restockItem(new Item("IceTea", 65, 300));
+
+        test.restockItem(new Item("Orangey", 165, 3300));
+        test.restockItem(new Item("Appley", 101, 250));
+
+
+        test.purchaseItem(1);
+        test.purchaseItem(1);
+        test.purchaseItem(2);
+
+        test.currentTransaction.removeItem(3);
+
+        test.dispenseCoin(20);
+        test.dispenseCoin(1);
+        test.dispenseCoin(.25);
+        test.currentTransaction.displayTransaction();
+
+
+        //test.displayItems();
+        //System.out.println(test.currentTransaction.cartedItems.get(0).getItemName());
+        //System.out.println(test.getSlot(iceTea2).getItem().getItemName());
     }
 
     // MCO2 (Pizza Ingredients)
