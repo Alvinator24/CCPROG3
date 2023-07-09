@@ -40,7 +40,7 @@ public class CoinDispenser {
 
     public boolean checkout(Transaction transaction, HashMap<Denomination, Integer> changeReturned, boolean pushThrough){
         boolean enoughChange = false;
-        double remainingChange = transaction.getTotalDispensed();
+        double remainingChange = transaction.getTotalDispensed() - transaction.getTotalPrice();
 
         HashMap<Denomination, Integer> tempCoinCollection = simulateTemporaryCoinCollection(transaction.getCoinCollection());
 

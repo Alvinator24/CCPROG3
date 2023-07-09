@@ -64,11 +64,32 @@ public class Driver {
 
             sc.close();
 
+<<<<<<< HEAD
         }
 
         
         //test.currentTransaction.displayTransaction();
         
+=======
+        test.restockItem(new Item("Orangey", 165, 3300));
+        test.restockItem(new Item("Appley", 101, 250));
+
+
+        test.purchaseItem(1);
+        test.purchaseItem(1);
+        test.purchaseItem(2);
+        test.purchaseItem(3);
+
+        //test.currentTransaction.removeItem(3);
+
+        test.dispenseCoin(20);
+        test.dispenseCoin(1);
+        test.dispenseCoin(1000);
+
+        test.displayTransaction();
+
+        test.checkout(true);
+>>>>>>> jab
 
         //test.displayItems();
         //System.out.println(test.currentTransaction.cartedItems.get(0).getItemName());

@@ -6,6 +6,8 @@ public class Transaction {
     private HashMap<Denomination, Integer> coinCollection;
     private ArrayList<Denomination> denomList;
     private double totalDispensed;
+    private double totalCalories;
+    private double totalPrice;
 
     // constructor
     public Transaction(ArrayList<Denomination> denomList) {
@@ -31,6 +33,8 @@ public class Transaction {
 
     public void addItem(Item item){
         cartedItems.add(item);
+        totalPrice += item.getPrice();
+        totalCalories += item.getCalories();
 
     }
 
@@ -75,6 +79,14 @@ public class Transaction {
 
     public ArrayList<Item> getCartedItems(){
         return cartedItems;
+    }
+
+    public double getTotalCalories(){
+        return totalCalories;
+    }
+
+    public double getTotalPrice(){
+        return totalPrice;
     }
 
 }
