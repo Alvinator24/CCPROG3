@@ -26,7 +26,7 @@ public class VendingMachine {
         
         denom = denoms;
 
-        
+
         // TODO: initialize denomm
 
         newTransaction();
@@ -35,7 +35,7 @@ public class VendingMachine {
     VendingMachine(String name, int slotLimit, int itemLimit, ArrayList<Denomination> denoms, String password) {
         this.name = name;
         this.slotLimit = slotLimit;
-        this.itemLimit = itemLimit;
+        this.itemLimit = itemLimit; 
         this.password = password;
         itemSlots = new ArrayList<Slot>();
         coinBank = new CoinDispenser(denoms);
@@ -205,6 +205,11 @@ public class VendingMachine {
                 System.out.println("===================");
                 System.out.println("Summary of purchase");
                 for(Item item : currentTransaction.getCartedItems()){
+                    for(int i  = 0; i < itemSlots.size(); ++i){
+                        if(itemSlots.get(i) == getSlot(item)){
+                            removeItem(i + 1);
+                        }
+                    }
                     System.out.println("Item: " + item.getItemName());
                     System.out.println("Price: " + item.getPrice());
                     System.out.println("Calories: " + item.getCalories());
@@ -259,12 +264,14 @@ public class VendingMachine {
         if(password.equals(this.password)){
             System.out.println("[1] Restock\n [2] Print Summary\n [3] Refill Denominations\n [4] Withdraw Cash");
             int choice = myObj.nextInt();
+            myObj.nextLine();
 
             switch(choice){
                 case 1: {
 
                     System.out.println("Enter item name: ");
                     String myObj2 =  myObj.nextLine();
+
 
                     System.out.println("Enter price: ");
                     double myObj3 =  myObj.nextDouble();
@@ -286,7 +293,7 @@ public class VendingMachine {
                     System.out.println("Enter Denomination Value: ");
                     double myObj5 =  myObj.nextDouble();
 
-                    dispenseCoin(myObj5);
+                    restockCash(myObj5);
 
                     break;
                 }

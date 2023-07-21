@@ -111,4 +111,13 @@ public class CoinDispenser {
         return 0;
     }
 
+    public void printMoney(){
+        System.out.println("Denomination : Count");
+        for(Denomination d : denomList){
+            System.out.println(d.getValue() +" : "+ coinCollection.get(d));
+
+        }
+
+    }
+
 }
