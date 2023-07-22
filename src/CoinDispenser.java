@@ -2,7 +2,7 @@ import java.util.*;
 public class CoinDispenser {
     
     private ArrayList<Denomination> denomList;
-    private HashMap<Denomination, Integer> coinCollection; 
+     HashMap<Denomination, Integer> coinCollection;  //make private
     
     public CoinDispenser(ArrayList<Denomination> denomList){
         coinCollection = new HashMap<Denomination, Integer>();

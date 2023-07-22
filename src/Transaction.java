@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class Transaction {
-    private HashMap<Integer, Integer> cartedItems;
-    private ArrayList<Slot> vendingProducts;
-    private HashMap<Denomination, Integer> coinCollection;
+    HashMap<Integer, Integer> cartedItems; //make private
+    ArrayList<Slot> vendingProducts; //make private
+     HashMap<Denomination, Integer> coinCollection; //make private
     private ArrayList<Denomination> denomList;
     private double totalDispensed;
     private double totalCalories;
@@ -26,7 +26,7 @@ public class Transaction {
 
         this.vendingProducts = vendingProducts;
         cartedItems = new HashMap<Integer, Integer>();
-        for(int i = 0; i < vendingProducts.size(); ++i){
+        for(int i = 0; i < this.vendingProducts.size(); ++i){
             cartedItems.put(i, 0);
         }
 

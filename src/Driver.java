@@ -1,6 +1,9 @@
 // import java.util.ArrayList;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
+
 
 public class Driver {
 
@@ -26,190 +29,61 @@ public class Driver {
         denoms.add(new Denomination(500));
         denoms.add(new Denomination(1000));
 
-        Item pineapple = new Item("pineapple", 75, 50);
-        Item apple = new Item("apple", 50, 40);
-        Item strawberry = new Item("strawberry", 60, 40);
-        Item orange = new Item("orange", 45, 70);
-        Item banana = new Item("banana", 35, 60);
-        Item dragonfruit = new Item("dragon fruit", 100, 90);
 
+        VendingMachine testVend = new VendingMachine("fruit pizza", 8, 10, denoms);
+        Item apple = new Item("apple", 100);
+        Item orange = new Item("orange", 500);
+        Item pineapple = new Item("pineapple", 600);
 
-        Scanner input = new Scanner(System.in);
+        Message message1 = new Message("Cutting apple", 0);
+        Message message2 = new Message("Sprinkling apple", 3);
 
-        String name;
-        int itemLimit;
-        int slotLimit;
+        ArrayList<Message> appleM = new ArrayList<>(List.of(message1, message2));
 
-        System.out.print("Enter vending machine name: ");
-        name = input.nextLine();
-        do{
-            System.out.print("Enter vending slot limit: ");
-            slotLimit = input.nextInt();
-        }while(slotLimit < 8);
+        Message message3 = new Message("Cutting orange", 0);
+        Message message4 = new Message("Sprinkling orange", 3);
 
-        do{
-            System.out.print("Enter slot item limit: ");
-            itemLimit = input.nextInt();
-        }while(itemLimit < 10);
+        ArrayList<Message> orangeM = new ArrayList<>(List.of(message3, message4));
 
+        Message message5 = new Message("Cutting pineapple", 0);
+        Message message6 = new Message("Sprinkling pineapple", 3);
 
-        VendingMachine testVending = new VendingMachine(name, slotLimit, itemLimit, denoms);
-        testVending.addItem(pineapple);
-        testVending.addItem(apple);
-        testVending.addItem(orange);
-        testVending.addItem(banana);
-        testVending.addItem(dragonfruit);
-        testVending.addItem(strawberry);
+        ArrayList<Message> pineappleM = new ArrayList<>(List.of(message5, message6));
 
-        testVending.restockItem(new Item("pineapple", 75, 50));
-        testVending.restockItem(new Item("pineapple", 75, 50));
-        testVending.restockItem(new Item("pineapple", 75, 50));
-
-        testVending.restockItem(new Item("apple", 50, 40));
-        testVending.restockItem(new Item("apple", 50, 40));
-
-        testVending.restockItem(new Item("orange", 45, 70));
-        testVending.restockItem(new Item("orange", 45, 70));
-
-        testVending.restockItem(new Item("strawberry", 60, 40));
-        testVending.restockItem(new Item("strawberry", 60, 40));
-
-        testVending.restockItem(new Item("banana", 35, 60));
-
-        testVending.restockItem(new Item("dragon fruit", 100, 90));
-        testVending.restockItem(new Item("dragon fruit", 100, 90));
+        testVend.addSlot(apple, 30, 0, appleM);
+        testVend.addSlot(orange, 70, 1, orangeM);
+        testVend.addSlot(pineapple, 100, 3, pineappleM);
 
 
 
-        int choice1, choice2, choice3, choice4;
-        boolean validChoice;
-        String strchoice;
+        testVend.updateInventoryCount();
+        HashMap<Integer, Integer> itemsSoFar = testVend.inventoryCount;
 
-        testVending.coinBank.printMoney();
-        do{
-            System.out.println("[1]. Test customer-side");
-            System.out.println("[2]. Test maintenance");
-            System.out.println("[3]. Exit");
-
-            System.out.print(": ");
-            choice1 = input.nextInt();
+        for(int i = 0; i < 3; ++i){
+            System.out.println(i + " - " + itemsSoFar.get(i));
+            System.out.println(testVend.getItemSlots().get(i).getItem().getItemName());
+        }
 
 
-            switch(choice1){
-                case 1:{
-                    do{
-                        testVending.displayItems();
-                        System.out.println("===============");
-                        System.out.println("In cart:");
-                        testVending.displayTransaction();
-                        System.out.println("[1]. Add to cart");
-                        System.out.println("[2]. Remove from cart");
-                        System.out.println("[3]. Checkout");
-                        System.out.println("[4]. Exit (change mind)");
-                        System.out.println("[5]. Insert denomination");
+        testVend.purchaseItem(0);
+        testVend.purchaseItem(1);
+        testVend.purchaseItem(2);
+        testVend.purchaseItem(0);
+        testVend.purchaseItem(0);
+        testVend.removeItem(0);
+        testVend.removeItem(0);
+        testVend.removeItem(0);
 
-                        System.out.println(": ");
-                        choice2 = input.nextInt();
+        testVend.dispenseCoin(500);
+        testVend.dispenseCoin(10000);
 
-                        switch(choice2){
-                            case 1:{
-                                do{
-                                    validChoice = false;
-                                    System.out.println("Enter slot number or 'x' to exit");
-                                    System.out.print(": ");
-                                    if(input.hasNextInt()){
-                                        choice2 = input.nextInt();
-                                        validChoice = testVending.purchaseItem(choice2);
-                                        choice2 = 1;
-                                    }
-                                    else{
-                                        strchoice = input.nextLine();
-                                        if(strchoice.equals("x")){
-                                            validChoice = true;
-                                        }
-                                    }
+        System.out.println(testVend.currentTransaction.getTotalDispensed() + " " + testVend.currentTransaction.getTotalCalories() + " " + testVend.currentTransaction.getTotalPrice());
 
+        HashMap<Integer, Integer> purchased = testVend.currentTransaction.getCartedItems();
 
-                                }while(!validChoice);
-                                break;
-                            }
-
-                            case 2:{
-                                do{
-                                    validChoice = false;
-                                    System.out.println("Enter slot number or 'x' to exit");
-                                    System.out.print(": ");
-                                    if(input.hasNextInt()){
-                                        choice2 = input.nextInt();
-                                        testVending.currentTransaction.removeItem(choice2);
-                                        validChoice = true;
-                                        choice2 = 1;
-                                    }
-                                    else{
-                                        strchoice = input.nextLine();
-                                        if(strchoice.equals("x")){
-                                            validChoice = true;
-                                        }
-                                    }
-
-
-                                }while(!validChoice);
-                            }
-                            case 5:{
-                                do{
-                                    validChoice = false;
-                                    System.out.println("Insert value of denomination or 'x' to exit");
-                                    System.out.print(": ");
-                                    if(input.hasNextInt()){
-                                        choice2 = input.nextInt();
-                                        validChoice = testVending.dispenseCoin(choice2);
-                                        choice2 = 1;
-                                    }
-                                    else{
-                                        strchoice = input.nextLine();
-                                        if(strchoice.equals("x")){
-                                            validChoice = true;
-                                        }
-                                    }
-
-
-                                }while(!validChoice);
-                                break;
-                            }
-
-                        }
-
-
-                    }while(!(choice2 == 4 || choice2 == 3));
-
-                    switch(choice2){
-                        case 3:
-                            testVending.checkout(true);
-                            break;
-                        case 4:
-                            testVending.checkout(false);
-                            break;
-                    }
-                    testVending.coinBank.printMoney();
-
-                    break;
-                }
-                case 2:{
-                    input.nextLine();
-                    do{
-
-                        System.out.println("Enter Password or 'x' to exit:  ");
-                        strchoice = input.nextLine();
-                        testVending.maintenance(strchoice);
-
-                    }while(!strchoice.equals("x"));
-                }
-
-
-            }
-
-        }while(choice1 != 3);
-
+        for(int i = 0; i < 3; ++i){
+            System.out.println(i + " - " + purchased.get(i));
+        }
 
 
 

@@ -26,6 +26,9 @@ public class SpecialVendingMachine extends VendingMachine{
         if(itemSlots.get(slotNum).getItemType() == 0 && !currentTransaction.getIsPackage()){
             isSuccessful = false;
         }
+        else if(itemSlots.get(slotNum).getItemType() == 3 && currentTransaction.getItemQuantity(slotNum) == 1){
+            isSuccessful = false;
+        }
         else{
             isSuccessful = currentTransaction.addItem(slotNum);
         }

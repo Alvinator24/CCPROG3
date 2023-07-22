@@ -7,14 +7,14 @@ public class VendingMachine {
     private String name;
     protected int slotLimit;
     private int itemLimit;
-    Transaction currentTransaction; //make private
+    protected Transaction currentTransaction; //make private
 
-    CoinDispenser coinBank;
+     CoinDispenser coinBank;
 
-    protected ArrayList<Slot> itemSlots;
+    ArrayList<Slot> itemSlots; //make private
     private ArrayList<Denomination> denom;
 
-    private HashMap<Item, Integer> inventoryCount;
+     HashMap<Integer, Integer> inventoryCount;
 
     // AND ITEMS
     VendingMachine(String name, int slotLimit, int itemLimit, ArrayList<Denomination> denoms) {
@@ -23,10 +23,11 @@ public class VendingMachine {
         this.itemLimit = itemLimit;
         itemSlots = new ArrayList<Slot>();
         coinBank = new CoinDispenser(denoms);
-        inventoryCount = new HashMap<Item, Integer>();
+        inventoryCount = new HashMap<Integer, Integer>();
 
         denom = denoms;
         newTransaction();
+        updateInventoryCount();
     }
 
     public boolean addSlot(Item item, double price, int itemType ,ArrayList<Message> messages) {  //change to slot number
@@ -35,6 +36,7 @@ public class VendingMachine {
             itemSlots.add(new Slot(item, itemLimit, price, itemType, messages));
             isSuccessful = true;
         }
+        newTransaction();;
         return isSuccessful;
     }
 
@@ -44,10 +46,11 @@ public class VendingMachine {
             itemSlots.remove(index);
             isSuccessful = true;
         }
+        newTransaction();
         return isSuccessful;
     }
 
-    public boolean restockItem(HashMap<Integer, Integer> adjustments, HashMap<Item, Integer> previousStock) { //change to slot number
+    public boolean restockItem(HashMap<Integer, Integer> adjustments, HashMap<Integer, Integer> previousStock) { //change to slot number
         boolean allGood = true;
 
         previousStock = inventoryCount;
@@ -65,16 +68,16 @@ public class VendingMachine {
                 }
             }
         }
+        newTransaction();
 
         return allGood;
     }
 
-    private void updateInventoryCount() {
-        HashMap<Item, Integer> newCount = new HashMap<Item, Integer>();
-        for (Slot slot : itemSlots) {
-            Item item = slot.getItem();
-            item = new Item(item.getItemName(), item.getCalories());
-            newCount.put(item, slot.getQuantity());
+    //make private
+    public void updateInventoryCount() {
+        HashMap<Integer, Integer> newCount = new HashMap<Integer, Integer>();
+        for(int i = 0; i < itemSlots.size(); ++i){
+            newCount.put(i, itemSlots.get(i).getQuantity());
         }
         inventoryCount = newCount;
     }
@@ -91,7 +94,7 @@ public class VendingMachine {
 
     //BELOW ARE FOR ITEM PURCHASING
     public boolean purchaseItem(int slotNum) {
-        return currentTransaction.addItem(slotNum - 1);
+        return currentTransaction.addItem(slotNum);
     }
 
     public boolean removeItem(int slotNum) {
@@ -143,5 +146,9 @@ public class VendingMachine {
 
     private void newTransaction() {
         currentTransaction = new Transaction(denom, itemSlots);
+    }
+
+    public ArrayList<Slot> getItemSlots() {
+        return itemSlots;
     }
 }
