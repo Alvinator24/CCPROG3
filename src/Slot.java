@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Slot {
 
@@ -7,15 +8,28 @@ public class Slot {
     private Item item;
     private int itemLimit;
     private double price;
+    private int itemType; //0 - solo | 1 - can be standalone | 2 - allows solo to be bought
     
     private ArrayList<Item> itemList;
+    private ArrayList<Message> messages;
 
 
-    public Slot(Item item, int itemLimit, double price) {
+
+
+
+
+    public Slot(Item item, int itemLimit, double price, int itemType, ArrayList<Message> messages) {
         this.item = item;
         this.itemLimit = itemLimit;
         this.price = price;
         itemList = new ArrayList<Item>();
+        this.messages = messages;
+        this.itemType = itemType;
+
+        //slot pre-filled for testing purposes (factory management decision, yes)
+        for(int i = 0; i < 3; ++i){
+            addItem();
+        }
         
     }
 
@@ -57,10 +71,13 @@ public class Slot {
         return price;
     }
 
+    public ArrayList<Message> getMessages() {
+        return messages;
+    }
 
-
-    
-    // public Item
+    public int getItemType(){
+        return itemType;
+    }
 
    
     

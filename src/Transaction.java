@@ -1,6 +1,7 @@
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class Transaction {
     private HashMap<Integer, Integer> cartedItems;
@@ -11,10 +12,13 @@ public class Transaction {
     private double totalCalories;
     private double totalPrice;
 
+    private boolean isPackage; //if true, solo-only items can be added.
+
     // constructor
     public Transaction(ArrayList<Denomination> denomList, ArrayList<Slot> vendingProducts) {
         this.denomList = denomList;
         totalDispensed = 0;
+        isPackage = false;
         coinCollection = new HashMap<Denomination, Integer>();
         for(Denomination denom : denomList){
             coinCollection.put(denom, 0); //our factory arbitrarily provides the vending machines with 10 coins
@@ -105,4 +109,45 @@ public class Transaction {
         coinCollection = change;
     }
 
+    public void setIsPackage(boolean set){
+        isPackage = set;
+    }
+
+    public boolean getIsPackage(){
+        return isPackage;
+    }
+
+    public ArrayList<String> getMessages() {
+        ArrayList<String> string_outputMessages = new ArrayList<String>();
+        ArrayList<Message> object_outputMessages = new ArrayList<Message>();
+
+        for(int i = 0; i < vendingProducts.size(); ++i){
+            if(cartedItems.get(i) > 0){
+                ArrayList<Message> tempMessages = vendingProducts.get(i).getMessages();
+                for(Message tempMessage: tempMessages){
+                    if(object_outputMessages.size() == 0){
+                        object_outputMessages.add(tempMessage);
+                    }
+                    else{
+                        for(int j = 0; j < object_outputMessages.size(); ++j){
+                            if(tempMessage.getPrecedence() <= object_outputMessages.get(j).getPrecedence()) {
+                                object_outputMessages.add(j, tempMessage);
+                                break;
+                            }
+                            if(j == object_outputMessages.size() - 1 && tempMessage.getPrecedence() > object_outputMessages.get(j).getPrecedence()){
+                                    object_outputMessages.add(tempMessage);
+                                    break;
+                                }
+                        }
+                    }
+                }
+            }
+        }
+
+        for(Message message: object_outputMessages){
+            string_outputMessages.add(message.getMessage());
+        }
+
+        return string_outputMessages;
+    }
 }

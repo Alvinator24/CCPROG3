@@ -1,17 +1,17 @@
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.Scanner;
 
 public class VendingMachine {
 
     private String name;
-    private int slotLimit;
+    protected int slotLimit;
     private int itemLimit;
-    private String password;
     Transaction currentTransaction; //make private
 
     CoinDispenser coinBank;
 
-    private ArrayList<Slot> itemSlots;
+    protected ArrayList<Slot> itemSlots;
     private ArrayList<Denomination> denom;
 
     private HashMap<Item, Integer> inventoryCount;
@@ -21,7 +21,6 @@ public class VendingMachine {
         this.name = name;
         this.slotLimit = slotLimit;
         this.itemLimit = itemLimit;
-        password = "admin";
         itemSlots = new ArrayList<Slot>();
         coinBank = new CoinDispenser(denoms);
         inventoryCount = new HashMap<Item, Integer>();
@@ -30,24 +29,10 @@ public class VendingMachine {
         newTransaction();
     }
 
-    VendingMachine(String name, int slotLimit, int itemLimit, ArrayList<Denomination> denoms, String password) {
-        this.name = name;
-        this.slotLimit = slotLimit;
-        this.itemLimit = itemLimit;
-        this.password = password;
-        itemSlots = new ArrayList<Slot>();
-        coinBank = new CoinDispenser(denoms);
-        inventoryCount = new HashMap<Item, Integer>();
-
-        denom = new ArrayList<Denomination>();
-
-        newTransaction();
-    }
-
-    public boolean addSlot(Item item, double price) {  //change to slot number
+    public boolean addSlot(Item item, double price, int itemType ,ArrayList<Message> messages) {  //change to slot number
         boolean isSuccessful = false;
         if (itemSlots.size() < slotLimit) {
-            itemSlots.add(new Slot(item, itemLimit, price));
+            itemSlots.add(new Slot(item, itemLimit, price, itemType, messages));
             isSuccessful = true;
         }
         return isSuccessful;
@@ -119,7 +104,8 @@ public class VendingMachine {
     }
 
 
-    public boolean checkout(boolean followThrough, Transaction receipt) {
+    //add messages. Arraylist strings?
+    public boolean checkout(boolean followThrough, Transaction receipt, ArrayList<String> outputMessage) {
         boolean possible = false;
         HashMap<Denomination, Integer> change = coinBank.simulateCheckout(currentTransaction.getCoinCollection(), null, currentTransaction);
 
@@ -128,8 +114,13 @@ public class VendingMachine {
         }
         if (followThrough && possible) {
             currentTransaction.setReceipt(coinBank.checkout(currentTransaction));
+            outputMessage = currentTransaction.getMessages();
             receipt = currentTransaction;
+            newTransaction();
+        } else if (followThrough && !possible) {
+            outputMessage.add("Machine does not have the appropriate change for this order");
         }
+
 
         return possible;
     }
