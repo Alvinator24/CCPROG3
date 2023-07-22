@@ -14,7 +14,8 @@ public class VendingMachine {
     private ArrayList<Slot> itemSlots;
     private ArrayList<Denomination> denom;
 
-    // TODO: MAKE SURE DRIVER CODE DOES NOT PASS LESS THAN MINIMUM NUMBER OF SLOTS
+    private HashMap<Item, Integer> inventoryCount;
+
     // AND ITEMS
     VendingMachine(String name, int slotLimit, int itemLimit, ArrayList<Denomination> denoms) {
         this.name = name;
@@ -23,290 +24,133 @@ public class VendingMachine {
         password = "admin";
         itemSlots = new ArrayList<Slot>();
         coinBank = new CoinDispenser(denoms);
-        
+        inventoryCount = new HashMap<Item, Integer>();
+
         denom = denoms;
-
-
-        // TODO: initialize denomm
-
         newTransaction();
     }
 
     VendingMachine(String name, int slotLimit, int itemLimit, ArrayList<Denomination> denoms, String password) {
         this.name = name;
         this.slotLimit = slotLimit;
-        this.itemLimit = itemLimit; 
+        this.itemLimit = itemLimit;
         this.password = password;
         itemSlots = new ArrayList<Slot>();
         coinBank = new CoinDispenser(denoms);
+        inventoryCount = new HashMap<Item, Integer>();
 
         denom = new ArrayList<Denomination>();
 
         newTransaction();
     }
 
-    public boolean addItem(Item item) { 
-        boolean isSuccessul = false;
-        Slot found = getSlot(item);
-
-       if(found == null){
-           if(itemSlots.size() < slotLimit){
-               Slot slot = new Slot(item, itemLimit);
-               itemSlots.add(slot);
-               isSuccessul = true;
-
-           }
-       }
-       else{
-           System.out.println("Slot for item already exists");
-       }
-
-
-        return isSuccessul;
-    }
-
-    // make it static (list of slots, since irl u dont change it once it's made)
-    // get the index from the user (n - 1, since it starts from 0)
-    
-    public boolean restockItem(Item item) {
-        boolean isSuccessful =  false;
-        Slot found = getSlot(item);
-        if(found != null){
-            if(found.getQuantity() < itemLimit){
-                found.addItem(item);
-            }
-         isSuccessful = true;
-        }
-        else{
-            System.out.println("Item isn't registered into vending machine");
+    public boolean addSlot(Item item, double price) {  //change to slot number
+        boolean isSuccessful = false;
+        if (itemSlots.size() < slotLimit) {
+            itemSlots.add(new Slot(item, itemLimit, price));
+            isSuccessful = true;
         }
         return isSuccessful;
     }
 
-    public void restockCash(double cash) {
-        coinBank.dispenseCoin(cash);
-    }
-
-    public boolean removeItem(int slotNum) { //change to private (make maintenance method w password)
-        boolean isSuccesful = false;
-        --slotNum;
-        Slot slot = itemSlots.get(slotNum);
-        if(slot.getQuantity() == 0){
-            System.out.println("Slot already empty");
-
+    public boolean removeSlot(int index) {
+        boolean isSuccessful = false;
+        if (index >= 0 && index < itemSlots.size()) {
+            itemSlots.remove(index);
+            isSuccessful = true;
         }
-        else{
-            slot.removeItem();
-            isSuccesful = true;
-        }
-        return  isSuccesful;
+        return isSuccessful;
     }
 
-    public Slot getSlot(Item item) {
-        Slot slot = null;
-        for (Slot i: itemSlots) {
-            if(i.getItem().getItemName().equals(item.getItemName()) && i.getItem().getPrice() == item.getPrice() && i.getItem().getCalories() == item.getCalories()) {
-                slot = i;
-            }
-        }
-        return slot;
-    }
+    public boolean restockItem(HashMap<Integer, Integer> adjustments, HashMap<Item, Integer> previousStock) { //change to slot number
+        boolean allGood = true;
 
-
-
-    public boolean purchaseItem(int slotNum) {
-        boolean success = false;
-        if(slotNum < itemSlots.size()) {
-
-            Item item = itemSlots.get(slotNum-1).getItem();
-            int itemsWanted = currentTransaction.getItemQuantity(item) + 1;
-            if(getAvailability(item, itemsWanted)){
-                currentTransaction.addItem(item);
-                success = true;
-            }
-        }
-        return success;
-
-    }
-
-
-    public boolean dispenseCoin(double valueInserted){
-        return currentTransaction.dispenseCoin(valueInserted);
-
-    }
-
-    public boolean displayTransaction() {
-        double change = 0;
-        boolean readyForCheckout = false;
-        int index = 0;
-
-        HashMap<Denomination, Integer> projectedChange = new HashMap<Denomination, Integer>();
-        for(Denomination s : denom){
-            projectedChange.put(s, 0);
-        }
-
-
-        for(Item item: currentTransaction.getCartedItems()){
-            ++index;
-            double itemPrice = item.getPrice();
-            double itemCalories = item.getCalories();
-
-
-            System.out.println("["+index+ "]" + item.getItemName() + "(" + itemCalories + " cals)");
-            System.out.println(itemPrice);
-        }
-
-        System.out.println("----------------");
-        System.out.println("Total Price: " + currentTransaction.getTotalPrice() + " | Total Calories : " + currentTransaction.getTotalCalories());
-
-        System.out.println("Amount inserted: " + currentTransaction.getTotalDispensed());
-        if(currentTransaction.getTotalDispensed() >= currentTransaction.getTotalPrice()) {
-            //print change
-            if (coinBank.checkout(currentTransaction, projectedChange, false)) ;
-            {
-                readyForCheckout = true;
-                for (Denomination s : denom) {
-                    change += projectedChange.get(s) * s.getValue();
-                }
-
-                System.out.println("Change: " + change);
-
-            }
-        }
-        return readyForCheckout;
-    }
-
-    public boolean haveChange(){ //FINISH
-        boolean enoughChange = false;
-
-
-        return enoughChange;
-    }
-
-
-    public void newTransaction(){
-        currentTransaction = new Transaction(denom);
-    }
-
-    public void addCash(int test) {
-
-    }
-
-    public void checkout(boolean followThrough){
-        HashMap<Denomination, Integer> change = new HashMap<Denomination, Integer>();
-        for(Denomination s : denom){
-            change.put(s, 0);
-        }
-
-        if(followThrough){
-            if(coinBank.checkout(currentTransaction, change,true)){
-
-                System.out.println("\n\nThank you for your purchase!");
-                System.out.println("===================");
-                System.out.println("Summary of purchase");
-                for(Item item : currentTransaction.getCartedItems()){
-                    for(int i  = 0; i < itemSlots.size(); ++i){
-                        if(itemSlots.get(i) == getSlot(item)){
-                            removeItem(i + 1);
-                        }
+        previousStock = inventoryCount;
+        updateInventoryCount();
+        for (Slot slot : itemSlots) {
+            for (int i = 0; i < Math.abs(adjustments.get(i)); ++i) {
+                if (adjustments.get(i) > 0) {
+                    if (slot.addItem() == false) {
+                        allGood = false;
                     }
-                    System.out.println("Item: " + item.getItemName());
-                    System.out.println("Price: " + item.getPrice());
-                    System.out.println("Calories: " + item.getCalories());
-                    System.out.println("-------------------");
-                }
-                System.out.println("===================");
-                System.out.println("Total Price: " + currentTransaction.getTotalPrice() + " | Total Calories: " + currentTransaction.getTotalCalories());
-
-                System.out.println("\n\n*Change given*");
-                for(Denomination s : denom){
-                    System.out.println(s.getValue() + " : " + change.get(s));
-                }
-            }
-            else{
-                System.out.println("Error dispensing change | maybe called when displayTransaction() returned false");
-            }
-        }
-        System.out.println("Thank you!\n");
-        newTransaction();
-
-    }
-
-    public void displayItems() {
-        int slotNum = 0;
-        for(Slot s : itemSlots){
-            ++slotNum;
-            String name = s.getItem().getItemName();
-            double price = s.getItem().getPrice();
-            double calories = s.getItem().getCalories();
-
-            System.out.println("------------------");
-            System.out.println("Slot " + slotNum);
-            System.out.println("Item: " + name);
-            System.out.println("Price: " + price);
-            System.out.println("Calories: " + calories);
-            System.out.println("Available: |" + s.getQuantity() + "|");
-        }
-    }
-
-    public boolean getAvailability(Item item, int numberOfOrders) {
-        boolean available = false;
-        if(getSlot(item).getQuantity() >= numberOfOrders) {
-            available = true;
-        }
-        return available;
-    }
-
-    public void maintenance(String password){
-        Scanner myObj = new Scanner(System.in);  // Create a Scanner object
-
-
-        if(password.equals(this.password)){
-            System.out.println("[1] Restock\n [2] Print Summary\n [3] Refill Denominations\n [4] Withdraw Cash");
-            int choice = myObj.nextInt();
-            myObj.nextLine();
-
-            switch(choice){
-                case 1: {
-
-                    System.out.println("Enter item name: ");
-                    String myObj2 =  myObj.nextLine();
-
-
-                    System.out.println("Enter price: ");
-                    double myObj3 =  myObj.nextDouble();
-
-                    System.out.println("Enter Calories: ");
-                    double myObj4 =  myObj.nextDouble();
-
-                    restockItem(new Item(myObj2, myObj3, myObj4));
-                    break;
-                }
-
-                case 2: {
-
-
-                    break;
-                }
-
-                case 3: {
-                    System.out.println("Enter Denomination Value: ");
-                    double myObj5 =  myObj.nextDouble();
-
-                    restockCash(myObj5);
-
-                    break;
-                }
-
-                case 4: {
-
-                    break;
+                } else {
+                    if (slot.removeItem() == false) {
+                        allGood = false;
+                    }
                 }
             }
         }
-        else{
-            System.out.println("Invalid Password");
-        }
+
+        return allGood;
     }
 
+    private void updateInventoryCount() {
+        HashMap<Item, Integer> newCount = new HashMap<Item, Integer>();
+        for (Slot slot : itemSlots) {
+            Item item = slot.getItem();
+            item = new Item(item.getItemName(), item.getCalories());
+            newCount.put(item, slot.getQuantity());
+        }
+        inventoryCount = newCount;
+    }
+
+
+    public void restockCash(HashMap<Denomination, Integer> coinPouch) {
+        coinBank.dispenseCoin(coinPouch);
+    }
+
+    public HashMap<Denomination, Integer> emptyCoins() {
+        return coinBank.emptyMachine();
+    } //
+
+
+    //BELOW ARE FOR ITEM PURCHASING
+    public boolean purchaseItem(int slotNum) {
+        return currentTransaction.addItem(slotNum - 1);
+    }
+
+    public boolean removeItem(int slotNum) {
+        return currentTransaction.removeItem(slotNum);
+    }
+
+
+    public boolean dispenseCoin(double valueInserted) {
+        return currentTransaction.dispenseCoin(valueInserted);
+    }
+
+
+    public boolean checkout(boolean followThrough, Transaction receipt) {
+        boolean possible = false;
+        HashMap<Denomination, Integer> change = coinBank.simulateCheckout(currentTransaction.getCoinCollection(), null, currentTransaction);
+
+        if (change != null) {
+            possible = true;
+        }
+        if (followThrough && possible) {
+            currentTransaction.setReceipt(coinBank.checkout(currentTransaction));
+            receipt = currentTransaction;
+        }
+
+        return possible;
+    }
+
+
+    public String getSlotName(int index) {
+        Item item = itemSlots.get(index).getItem();
+        return item.getItemName();
+    } //good
+
+    public double getSlotCalories(int index) {
+        Item item = itemSlots.get(index).getItem();
+        return item.getCalories();
+    } //good
+
+    public double getSlotPrice(int index) {
+        return itemSlots.get(index).getPrice();
+    } //good
+
+
+    private void newTransaction() {
+        currentTransaction = new Transaction(denom, itemSlots);
+    }
 }

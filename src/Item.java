@@ -4,7 +4,7 @@ public class Item {
     private double calories;
 
     // constructor for the Item class
-    public Item(String itemName, double price, double calories) {
+    public Item(String itemName, double calories) {
         this.itemName = itemName;
         this.calories = calories;
     }

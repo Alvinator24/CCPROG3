@@ -27,27 +27,34 @@ public class Slot {
         return item;
     }
 
-    public boolean addItem(Item item){
-        boolean isSuccessful = false;
-        if(itemList.size() < itemLimit){
-            itemList.add(item);
-            isSuccessful = true;
-        }
-        
-        return isSuccessful;
+    public boolean addItem(){
+        boolean successfull = false;
 
+        if(itemList.size() < itemLimit){
+            String name = item.getItemName();
+            double calories = item.getCalories();
+            itemList.add(new Item(name, calories));
+            successfull = true;
+        }
+
+        return successfull;
     }
 
-    public void removeItem(){
-        System.out.println(itemList.size());
+    public boolean removeItem(){
+        boolean successfull = false;
         if(itemList.size() > 0){
             itemList.remove(itemList.size() - 1);
+            successfull = true;
         }
-        System.out.println(itemList.size());
+        return successfull;
     }
 
     public void setPrice(double price){
         this.price = price;
+    }
+
+    public double getPrice(){
+        return price;
     }
 
 

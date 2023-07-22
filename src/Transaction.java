@@ -1,8 +1,10 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Transaction {
-    ArrayList<Item> cartedItems;
+    private HashMap<Integer, Integer> cartedItems;
+    private ArrayList<Slot> vendingProducts;
     private HashMap<Denomination, Integer> coinCollection;
     private ArrayList<Denomination> denomList;
     private double totalDispensed;
@@ -10,8 +12,7 @@ public class Transaction {
     private double totalPrice;
 
     // constructor
-    public Transaction(ArrayList<Denomination> denomList) {
-        cartedItems = new ArrayList<Item>();
+    public Transaction(ArrayList<Denomination> denomList, ArrayList<Slot> vendingProducts) {
         this.denomList = denomList;
         totalDispensed = 0;
         coinCollection = new HashMap<Denomination, Integer>();
@@ -19,29 +20,40 @@ public class Transaction {
             coinCollection.put(denom, 0); //our factory arbitrarily provides the vending machines with 10 coins
         }
 
-    }
-
-    public int getItemQuantity(Item item){
-        int total = 0;
-        for(Item i : cartedItems){
-            if(i.getItemName().equals(item.getItemName()) && i.getCalories() == item.getCalories() && i.getPrice() == item.getPrice()){
-                ++total;
-            }
+        this.vendingProducts = vendingProducts;
+        cartedItems = new HashMap<Integer, Integer>();
+        for(int i = 0; i < vendingProducts.size(); ++i){
+            cartedItems.put(i, 0);
         }
-        return total;
-    }
-
-    public void addItem(Item item){
-        cartedItems.add(item);
-        totalPrice += item.getPrice();
-        totalCalories += item.getCalories();
 
     }
 
-    public void removeItem(int index){
-        --index;
-        cartedItems.remove(index);
+    public int getItemQuantity(int index){
+        return cartedItems.get(index);
 
+    }
+
+    public boolean addItem(int index){
+        boolean successful = false;
+        if(getItemQuantity(index) < vendingProducts.get(index).getQuantity()){
+            cartedItems.put(index, cartedItems.get(index) + 1);
+            totalCalories += vendingProducts.get(index).getItem().getCalories();
+            totalPrice += vendingProducts.get(index).getPrice();
+            successful = true;
+        }
+
+        return successful;
+    }
+
+    public boolean removeItem(int index){
+        boolean successfull = false;
+        if(getItemQuantity(index) > 0){
+            cartedItems.put(index, cartedItems.get(index) - 1);
+            totalPrice -= vendingProducts.get(index).getPrice();
+            totalCalories -= vendingProducts.get(index).getItem().getCalories();
+            successfull = true;
+        }
+        return successfull;
     }
 
     public boolean dispenseCoin(double value){
@@ -77,7 +89,7 @@ public class Transaction {
         return coinCollection;
     }
 
-    public ArrayList<Item> getCartedItems(){
+    public HashMap<Integer, Integer> getCartedItems() {
         return cartedItems;
     }
 
@@ -87,6 +99,10 @@ public class Transaction {
 
     public double getTotalPrice(){
         return totalPrice;
+    }
+
+    public void setReceipt(HashMap<Denomination, Integer> change){
+        coinCollection = change;
     }
 
 }
