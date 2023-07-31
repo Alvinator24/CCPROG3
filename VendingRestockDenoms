@@ -1,0 +1,56 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
+public class VendingRestockDenoms {
+
+    JFrame frame = new JFrame();
+    JLabel label = new JLabel("Select the denom to restock:");
+    JLabel label2 = new JLabel("Enter the amount to restock:");
+    JButton done = new JButton("Done");
+
+    JTextField textField = new JTextField(5);
+
+    String[] denoms = {"1000", "500", "100", "50", "10", "5", "1"};
+    JComboBox comboBox = new JComboBox(denoms);
+
+
+    public VendingRestockDenoms() {
+
+        frame.setSize(500, 500);
+        frame.setTitle("Restock Denoms");
+
+        textField.setBounds(5, 5, 5, 5);
+
+        frame.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        frame.add(label, gbc);
+        gbc.gridy = 1;
+        frame.add(comboBox, gbc);
+        gbc.gridy = 2;
+        frame.add(label2, gbc);
+        gbc.gridy = 3;
+        frame.add(textField, gbc);
+        gbc.gridy = 4;
+        frame.add(done, gbc);
+        frame.setVisible(true);
+
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == comboBox) {
+            System.out.println(comboBox.getSelectedItem());
+        }
+    }
+
+    public static void main(String[] args) {
+        new VendingRestockDenoms();
+    }
+
+}
