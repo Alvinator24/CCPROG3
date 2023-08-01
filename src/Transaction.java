@@ -27,6 +27,7 @@ public class Transaction {
         this.vendingProducts = vendingProducts;
         cartedItems = new HashMap<Integer, Integer>();
         for(int i = 0; i < this.vendingProducts.size(); ++i){
+            System.out.println(vendingProducts.get(i).getItem().getItemName());
             cartedItems.put(i, 0);
         }
 
@@ -39,6 +40,9 @@ public class Transaction {
 
     public boolean addItem(int index){
         boolean successful = false;
+        if(vendingProducts.get(index).getItemType() == 3){
+            isPackage = true;
+        }
         if(getItemQuantity(index) < vendingProducts.get(index).getQuantity()){
             cartedItems.put(index, cartedItems.get(index) + 1);
             totalCalories += vendingProducts.get(index).getItem().getCalories();
@@ -51,6 +55,9 @@ public class Transaction {
 
     public boolean removeItem(int index){
         boolean successfull = false;
+        if(vendingProducts.get(index).getItemType() == 3){
+            isPackage = false;
+        }
         if(getItemQuantity(index) > 0){
             cartedItems.put(index, cartedItems.get(index) - 1);
             totalPrice -= vendingProducts.get(index).getPrice();
@@ -116,6 +123,7 @@ public class Transaction {
     public boolean getIsPackage(){
         return isPackage;
     }
+
 
     public ArrayList<String> getMessages() {
         ArrayList<String> string_outputMessages = new ArrayList<String>();

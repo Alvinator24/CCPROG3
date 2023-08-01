@@ -13,11 +13,6 @@ public class Slot {
     private ArrayList<Item> itemList;
     private ArrayList<Message> messages;
 
-
-
-
-
-
     public Slot(Item item, int itemLimit, double price, int itemType, ArrayList<Message> messages) {
         this.item = item;
         this.itemLimit = itemLimit;

@@ -9,6 +9,7 @@ public class SpecialVendingMachine extends VendingMachine{
         for(Slot slot: menu){
             addSlot(slot);
         }
+        newTransaction();
     }
 
     private boolean addSlot(Slot slot) {
@@ -39,7 +40,7 @@ public class SpecialVendingMachine extends VendingMachine{
     @Override
     public boolean removeItem(int slotNum) {
         boolean isSuccessful = false;
-        if(itemSlots.get(slotNum).getItemType() == 2){
+        if(itemSlots.get(slotNum).getItemType() == 3 && currentTransaction.getIsPackage()){
             for(int i  = 0; i < itemSlots.size(); ++i){
                 int numOfItems = currentTransaction.getCartedItems().get(i);
                 if(numOfItems > 0 && itemSlots.get(i).getItemType() == 0){
@@ -48,6 +49,10 @@ public class SpecialVendingMachine extends VendingMachine{
                     }
                 }
             }
+            currentTransaction.removeItem(slotNum);
+        }
+        else{
+            isSuccessful = currentTransaction.removeItem(slotNum);
         }
         return isSuccessful;
     }

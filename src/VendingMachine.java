@@ -108,11 +108,18 @@ public class VendingMachine {
 
 
     //add messages. Arraylist strings?
-    public boolean checkout(boolean followThrough, Transaction receipt, ArrayList<String> outputMessage) {
+    public boolean checkout(boolean followThrough, Transaction receipt, ArrayList<String> outputMessage, HashMap<Denomination, Integer> change) {
         boolean possible = false;
-        HashMap<Denomination, Integer> change = coinBank.simulateCheckout(currentTransaction.getCoinCollection(), null, currentTransaction);
+        HashMap<Denomination,Integer> tempHash = coinBank.simulateCheckout(currentTransaction.getCoinCollection(), null, currentTransaction);
+        if(tempHash != null){
+            for(Denomination denoms: denom){
+                change.put(denoms, tempHash.get(denoms));
+            }
+        }
 
-        if (change != null) {
+
+
+        if (tempHash != null) {
             possible = true;
         }
         if (followThrough && possible) {
@@ -123,6 +130,7 @@ public class VendingMachine {
         } else if (followThrough && !possible) {
             outputMessage.add("Machine does not have the appropriate change for this order");
         }
+        System.out.println(String.valueOf(possible));
 
 
         return possible;
@@ -144,11 +152,19 @@ public class VendingMachine {
     } //good
 
 
-    private void newTransaction() {
+    public void newTransaction() {
         currentTransaction = new Transaction(denom, itemSlots);
     }
 
     public ArrayList<Slot> getItemSlots() {
         return itemSlots;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Transaction getCurrentTransaction() {
+        return currentTransaction;
     }
 }

@@ -56,7 +56,7 @@ public class CoinDispenser {
     {
         HashMap<Denomination, Integer> temporaryBank = new HashMap<Denomination, Integer>();
         for(Denomination denom : this.denomList){
-            temporaryBank.put(denom, givenPouch.get(denom) + coinCollection.get(denom)); //our factory arbitrarily provides the vending machines with 10 coins
+            temporaryBank.put(denom, givenPouch.get(denom) + coinCollection.get(denom));
         }
         return temporaryBank;
 
@@ -65,20 +65,25 @@ public class CoinDispenser {
     public HashMap<Denomination, Integer> simulateCheckout(HashMap<Denomination, Integer> givenPouch, HashMap<Denomination, Integer> simulatedBank, Transaction transaction) {
         boolean enoughChange = true;
         HashMap<Denomination, Integer> possibleChange = new HashMap<Denomination, Integer>();
-        for(Denomination denom : denomList){
+        for(Denomination denom: denomList){
             possibleChange.put(denom, 0);
         }
+
         if(simulatedBank == null){
             simulatedBank = simulateTemporaryCoinCollection(givenPouch);
         }
 
 
-        double remainingChange = transaction.getTotalPrice() - transaction.getTotalDispensed();
+        double remainingChange =  transaction.getTotalDispensed() - transaction.getTotalPrice();
+        if(remainingChange < 0){
+            enoughChange = false;
+            possibleChange = null;
+        }
 
-        int denomCounter = 0, numOfCoins;
+        int denomCounter = denomList.size() - 1, numOfCoins;
         while(remainingChange > 0 && enoughChange){
             numOfCoins = 0;
-            if(denomCounter < denomList.size()){
+            if(denomCounter >= 0){
                 numOfCoins = (int)(remainingChange / denomList.get(denomCounter).getValue());
                 if(numOfCoins > simulatedBank.get(denomList.get(denomCounter))){
                     numOfCoins = simulatedBank.get(denomList.get(denomCounter));
@@ -87,13 +92,15 @@ public class CoinDispenser {
                 remainingChange -= numOfCoins * denomList.get(denomCounter).getValue();
 
                 simulatedBank.put(denomList.get(denomCounter), simulatedBank.get(denomList.get(denomCounter)) - numOfCoins);
-                ++denomCounter;
+                --denomCounter;
             }
             else{
+                System.out.println("not enough money inserted");
                 enoughChange = false;
                 possibleChange = null;
             }
         }
+
 
         return possibleChange;
     }
@@ -116,9 +123,15 @@ public class CoinDispenser {
     public static double countCoins(ArrayList<Denomination> denomList, HashMap<Denomination, Integer> coinPouch){
         double total = 0;
 
-        for(Denomination denom : denomList){
-           total += coinPouch.get(denom) * denom.getValue();
+        if(coinPouch != null){
+            for(Denomination denom : denomList){
+                total += coinPouch.get(denom) * denom.getValue();
+
+
+
+            }
         }
+
 
         return total;
 
@@ -140,13 +153,5 @@ public class CoinDispenser {
         return change;
     }
 
-    public void printMoney(){
-        System.out.println("Denomination : Count");
-        for(Denomination d : denomList){
-            System.out.println(d.getValue() +" : "+ coinCollection.get(d));
-
-        }
-
-    }
 
 }
