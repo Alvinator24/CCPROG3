@@ -261,9 +261,34 @@ public class Maintenance_Menu {
 
 
     }
+    public void displayEmpty(ArrayList<String> returned, double total){
+        JFrame moneyReturned = new JFrame();
+        moneyReturned.setTitle("Money Returned");
+        moneyReturned.setLayout(new MigLayout("wrap 2, fillx", "[]15[]"));
+
+        moneyReturned.add(new JLabel("Money from machine"),"wrap");
+        moneyReturned.add(new JLabel("Total Revenue: " + String.valueOf(total)), "wrap");
+
+
+        for(int i = 2; i < returned.size(); ++i){
+            if(i % 2 == 0){
+                moneyReturned.add(new JLabel(returned.get(i) + " PHP"));
+            }
+            else{
+                moneyReturned.add(new JLabel(returned.get(i)), "align right");
+            }
+        }
+
+
+        moneyReturned.pack();
+        moneyReturned.setVisible(true);
+
+
+    }
 
     public void displayStock(ArrayList<String> sold, double revenue, double calories){
         JFrame pastTransacts = new JFrame();
+        pastTransacts.setTitle("Stats since last re-stock");
         pastTransacts.setLayout(new MigLayout("wrap 2, fillx", "[]15[]"));
 
         pastTransacts.add(new JLabel("Stats since last re-stock"),"wrap");
@@ -438,6 +463,14 @@ public class Maintenance_Menu {
         restockDenoms_addButton.addActionListener(actn);
     }
 
+    public void setEmptyMachineButton(ActionListener actn) {
+        ActionListener[] actnlstnrs;
+        actnlstnrs = emptyMachineButton.getActionListeners();
+        if(actnlstnrs.length == 1){
+            emptyMachineButton.removeActionListener((ActionListener)Array.get(actnlstnrs, 0));
+        }
+        emptyMachineButton.addActionListener(actn);
+    }
 
     public void resetFields(){
         addItem_itemCaloriesField.setText("");

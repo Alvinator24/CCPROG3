@@ -286,6 +286,22 @@ public class Factory {
                 maintenanceMenu.setRestockDenoms_denomQuantity(String.valueOf(vendingList.get(index).getCoinBank().getCoinCollection().get(denomList.get(maintenanceMenu.getDenomsDropDown()))));
             }
         });
+        maintenanceMenu.setEmptyMachineButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                HashMap<Denomination, Integer> returned = new HashMap<Denomination, Integer>();
+                returned = vendingList.get(index).emptyCoins();
+                CoinDispenser.countCoins(denomList, returned);
+
+
+                ArrayList<String> cashStats = new ArrayList<String>();
+                for(Denomination denom : denomList){
+                    cashStats.add(String.valueOf(denom.getValue()));
+                    cashStats.add(String.valueOf(returned.get(denom)));
+                }
+                maintenanceMenu.displayEmpty(cashStats, CoinDispenser.countCoins(denomList, returned));
+            }
+        });
 
 
         ArrayList<String> slots = new ArrayList<String>();
