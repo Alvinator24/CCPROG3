@@ -28,8 +28,6 @@ public class VendingMachine_Menu extends JFrame {
     VendingMachine_Menu(ArrayList<Denomination> denomList){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new MigLayout());
-        //setSize(1300,750);
-        //this.setPreferredSize(new Dimension(1400, 850));
 
 
         slotPanel = new JPanel();
@@ -75,7 +73,6 @@ public class VendingMachine_Menu extends JFrame {
         add(resetButton);
         add(maintenance);
 
-        //setTransaction(null);
 
     }
 
@@ -230,7 +227,7 @@ public class VendingMachine_Menu extends JFrame {
 
         for(int i = 0; i < ordered.size(); ++i){
             if(i % 2 == 0){
-                orders.add(new JLabel("•" + ordered.get(i)));
+                orders.add(new JLabel("-" + ordered.get(i)));
             }
             else{
                 orders.add(new JLabel(ordered.get(i)), "align right");
@@ -285,6 +282,7 @@ public class VendingMachine_Menu extends JFrame {
     public double getSelectedDenom(){
         return Double.parseDouble((String)denomDropDown.getSelectedItem());
     }
+
 
     //replaced by setVending?
     public void addVending(ArrayList<VendingMachine> vendingList){
@@ -368,6 +366,10 @@ public class VendingMachine_Menu extends JFrame {
 
     public void setMachineName(String machineName) {
         this.machineName.setText(machineName);
+    }
+
+    public void setMaintenance(ActionListener actn) {
+        maintenance.addActionListener(actn);
     }
 
     public void setMenu(int mode){

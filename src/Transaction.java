@@ -152,6 +152,7 @@ public class Transaction {
     }
 
 
+
     public ArrayList<String> getMessages() {
         ArrayList<String> string_outputMessages = new ArrayList<String>();
         ArrayList<Message> object_outputMessages = new ArrayList<Message>();
@@ -183,9 +184,6 @@ public class Transaction {
         for(int i = object_outputMessages.size()-1 ; i >= 0; --i){
             string_outputMessages.add(object_outputMessages.get(i).getMessage());
         }
-//        for(Message message: object_outputMessages){
-//            string_outputMessages.add(message.getMessage());
-//        }
 
         return string_outputMessages;
     }

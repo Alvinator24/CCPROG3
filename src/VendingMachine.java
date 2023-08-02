@@ -25,9 +25,10 @@ public class VendingMachine {
         coinBank = new CoinDispenser(denoms);
         inventoryCount = new HashMap<Integer, Integer>();
 
+
         denom = denoms;
         newTransaction();
-        updateInventoryCount();
+
     }
 
     public boolean addSlot(Item item, double price, int itemType ,ArrayList<Message> messages) {  //change to slot number
@@ -37,6 +38,11 @@ public class VendingMachine {
             isSuccessful = true;
         }
         newTransaction();;
+
+        if(!inventoryCount.containsKey(itemSlots.size() - 1)){
+            inventoryCount.put(itemSlots.size()-1, 0);
+        }
+        refreshInventoryCount();
         return isSuccessful;
     }
 
@@ -47,39 +53,55 @@ public class VendingMachine {
             isSuccessful = true;
         }
         newTransaction();
+        refreshInventoryCount();
         return isSuccessful;
     }
 
-    public boolean restockItem(HashMap<Integer, Integer> adjustments, HashMap<Integer, Integer> previousStock) { //change to slot number
+    public boolean restockItem(HashMap<Integer, Integer> adjustments) { //change to slot number
         boolean allGood = true;
 
-        previousStock = inventoryCount;
-        updateInventoryCount();
-        for (Slot slot : itemSlots) {
-            for (int i = 0; i < Math.abs(adjustments.get(i)); ++i) {
-                if (adjustments.get(i) > 0) {
-                    if (slot.addItem() == false) {
+        for(int i = 0; i < itemSlots.size(); ++i){
+            if(adjustments.get(i) > 0){
+                for(int j = 0; j < adjustments.get(i); ++j){
+                    if (itemSlots.get(i).addItem() == false) {
                         allGood = false;
                     }
-                } else {
-                    if (slot.removeItem() == false) {
+                }
+            }
+            else if(adjustments.get(i) < 0){
+                for(int j = 0; j < Math.abs(adjustments.get(i)); ++j){
+                    if (itemSlots.get(i).removeItem() == false) {
                         allGood = false;
                     }
                 }
             }
         }
+
         newTransaction();
+        inventoryCount = new HashMap<Integer, Integer>();
+        for(int i = 0; i < itemSlots.size(); ++i){
+            inventoryCount.put(i, 0);
+        }
 
         return allGood;
     }
 
     //make private
-    public void updateInventoryCount() {
-        HashMap<Integer, Integer> newCount = new HashMap<Integer, Integer>();
-        for(int i = 0; i < itemSlots.size(); ++i){
-            newCount.put(i, itemSlots.get(i).getQuantity());
+    public void updateInventoryCount(HashMap<Integer, Integer> sold) {
+        refreshInventoryCount();
+
+        for(int i = 0; i < itemSlots.size(); ++i) {
+            inventoryCount.put(i, inventoryCount.get(i) + sold.get(i));
         }
-        inventoryCount = newCount;
+    }
+
+    public void refreshInventoryCount(){
+        for(int i = 0; i < itemSlots.size(); ++i){
+            if(!inventoryCount.containsKey(i)){
+                inventoryCount.put(i, 0);
+            }
+
+        }
     }
 
 
@@ -129,6 +151,7 @@ public class VendingMachine {
                 System.out.println(str);
             }
             currentTransaction.transferDetails(receipt);
+            updateInventoryCount(currentTransaction.getCartedItems());
 
             int bought;
             for(int i = 0; i < getItemSlots().size(); ++i){
@@ -178,7 +201,19 @@ public class VendingMachine {
         return name;
     }
 
+    public int getItemLimit() {
+        return itemLimit;
+    }
+
     public Transaction getCurrentTransaction() {
         return currentTransaction;
+    }
+
+    public HashMap<Integer, Integer> getInventoryCount() {
+        return inventoryCount;
+    }
+
+    public CoinDispenser getCoinBank() {
+        return coinBank;
     }
 }

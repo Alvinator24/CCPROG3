@@ -153,5 +153,7 @@ public class CoinDispenser {
         return change;
     }
 
-
+    public HashMap<Denomination, Integer> getCoinCollection() {
+        return coinCollection;
+    }
 }

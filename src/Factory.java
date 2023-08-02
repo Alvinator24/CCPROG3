@@ -1,5 +1,8 @@
+import com.sun.tools.javac.Main;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -11,15 +14,14 @@ public class Factory {
 
     View_MainMenu mainMenu;
     VendingMachine_Menu vendingMenu;
-    //Maintenance_Menu maintenanceMenu
+    Maintenance_Menu maintenanceMenu;
 
      Factory(ArrayList<Denomination> denomList){
         this.denomList = denomList;
         this.vendingList = new ArrayList<VendingMachine>();
         mainMenu = new View_MainMenu();
         vendingMenu = new VendingMachine_Menu(denomList);
-
-        //start maintenance menu
+         maintenanceMenu = new Maintenance_Menu();
 
         startFactory();
     }
@@ -86,6 +88,27 @@ public class Factory {
                 setVending(vendingMenu.getVendingDropDown().getSelectedIndex());
             }
         });
+        vendingMenu.setMaintenance(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                vendingMenu.setMenu(0);
+                maintenanceMenu.setMenu(0);
+            }
+        });
+        vendingMenu.setExitButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainMenu.setMenu(0);
+                vendingMenu.setMenu(0);
+            }
+        });
+        ArrayList<String> denominations = new ArrayList<String>();
+        for(Denomination denom: denomList){
+            denominations.add(String.valueOf(denom.getValue()));
+        }
+        String[] denomArry = denominations.toArray(new String[0]);
+        maintenanceMenu.setDenomsDropDown(denomArry);
+
 
 
     }
@@ -121,6 +144,7 @@ public class Factory {
             slotViews.add(newSlot);
             vendingMenu.addSlot(newSlot);
         }
+
         updatePurchased(index);
 
 
@@ -145,6 +169,135 @@ public class Factory {
             }
         });
 
+        maintenanceMenu.setAddAddItemButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String itemName = maintenanceMenu.getAddItem_itemNameField();
+                double price = Double.parseDouble(maintenanceMenu.getAddItem_itemPriceField());
+                double calories = Double.parseDouble(maintenanceMenu.getAddItem_itemCaloriesField());
+                int itemType = 1;
+                ArrayList<Message> messages = new ArrayList<Message>();
+                messages.add(new Message("Preparing " + itemName+"...", 4));
+                messages.add(new Message("Placing "+ itemName + "...", 1));
+
+                Item item = new Item(itemName, calories);
+                vendingList.get(index).addSlot(item, price, itemType, messages);
+                setVending(index);
+            }
+        });
+        maintenanceMenu.setExitButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                vendingMenu.setMenu(1);
+                vendingMenu.setMenu(5);
+                setVending(index);
+            }
+        });
+
+        maintenanceMenu.setSlotDropDown(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int slotIndex = maintenanceMenu.getSlotDropDown();
+                System.out.println("UO" + slotIndex);
+                maintenanceMenu.setRestockItem_itemQuantity(vendingList.get(index).getItemSlots().get(slotIndex).getQuantity());
+                maintenanceMenu.setRestockItem_Price(vendingList.get(index).getItemSlots().get(slotIndex).getPrice());
+            }
+        });
+
+        maintenanceMenu.setRestockItem_addButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                HashMap<Integer, Integer> stock = vendingList.get(index).getInventoryCount();
+                HashMap<Integer, Integer> tobeAdded = new HashMap<Integer, Integer>();
+                int slotIndex = maintenanceMenu.getSlotDropDown();
+                int amount = Integer.parseInt(maintenanceMenu.getRestockItem_itemQuantityField());
+                System.out.println(amount);
+                double price = Double.parseDouble(maintenanceMenu.getRestockItem_Price());
+
+                for(int i = 0; i < vendingList.get(index).getItemSlots().size(); ++i){
+                    if(slotIndex == i){
+                        tobeAdded.put(i, amount);
+                        if(price != vendingList.get(index).getItemSlots().get(i).getPrice()){
+                            vendingList.get(index).getItemSlots().get(i).setPrice(price);
+                        }
+                    }
+                    else{
+                        tobeAdded.put(i, 0);
+                    }
+
+                }
+                ArrayList<String> summary = new ArrayList<String>();
+
+                double revenue = 0;
+                double calories = 0;
+                int numOf = 0;
+
+                for(int i = 0 ; i<vendingList.get(index).getItemSlots().size(); ++i){
+                    summary.add(vendingList.get(index).getItemSlots().get(i).getItem().getItemName());
+                    summary.add(String.valueOf(stock.get(i)));
+                    if((numOf = stock.get(i)) > 0){
+                        revenue += numOf * vendingList.get(index).getItemSlots().get(i).getPrice();
+                        calories += numOf * vendingList.get(index).getItemSlots().get(i).getItem().getCalories();
+                    }
+                }
+
+
+
+
+
+                vendingList.get(index).restockItem(tobeAdded);
+                setVending(index);
+                maintenanceMenu.displayStock(summary, revenue, calories);
+            }
+        });
+        maintenanceMenu.setRestockDenoms_addButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int denomIndex = maintenanceMenu.getDenomsDropDown();
+                int numOfDenom = Integer.parseInt(maintenanceMenu.getRestockDenom_quantityField());
+
+                HashMap<Denomination, Integer> coinPouch = new HashMap<Denomination, Integer>();
+                for(int i = 0; i < denomList.size(); ++i){
+                    if(i == denomIndex){
+                        coinPouch.put(denomList.get(i), numOfDenom);
+                    }
+                    else{
+                        coinPouch.put(denomList.get(i),0);
+                    }
+                }
+
+                vendingList.get(index).restockCash(coinPouch);
+
+                setVending(index);
+            }
+        });
+        maintenanceMenu.setDenomsDropDown(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int denomIndex = maintenanceMenu.getDenomsDropDown();
+                maintenanceMenu.setRestockDenoms_denomQuantity(String.valueOf(vendingList.get(index).getCoinBank().getCoinCollection().get(denomList.get(denomIndex))));
+
+            }
+        });
+
+        maintenanceMenu.setRestockDenomsButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                maintenanceMenu.setRestockDenoms_denomQuantity(String.valueOf(vendingList.get(index).getCoinBank().getCoinCollection().get(denomList.get(maintenanceMenu.getDenomsDropDown()))));
+            }
+        });
+
+
+        ArrayList<String> slots = new ArrayList<String>();
+        for(Slot slot: vendingList.get(index).itemSlots){
+            slots.add(slot.getItem().getItemName());
+        }
+        String[] str_slots = slots.toArray(new String[0]);
+        maintenanceMenu.setSlotDropDown(str_slots);
+        maintenanceMenu.setRestockItem_itemQuantity(vendingList.get(index).getItemSlots().get(0).getQuantity());
+        maintenanceMenu.setRestockItem_Price(vendingList.get(index).getItemSlots().get(0).getPrice());
+
+
     }
 
     public void checkoutItems(int vendingIndex){
@@ -152,6 +305,7 @@ public class Factory {
          HashMap<Denomination, Integer> change = new HashMap<Denomination, Integer>();
          Transaction receipt =  new Transaction(denomList,vendingList.get(vendingIndex).getItemSlots());
          vendingList.get(vendingIndex).checkout(true, receipt, outputMessages, change);
+
 
 
         updatePurchased(vendingIndex);
@@ -203,7 +357,7 @@ public class Factory {
              if(number > 0){
 
                  currentItem = products.get(i).getItem();
-                 ordered.add("•" + " " + currentItem.getItemName() + "(" + number + ")");
+                 ordered.add("-" + " " + currentItem.getItemName() + "(" + number + ")");
                  ordered.add("PHP " + products.get(i).getPrice() * number + " | " + currentItem.getCalories() * number + " kcals");
              }
          }
