@@ -123,9 +123,23 @@ public class VendingMachine {
             possible = true;
         }
         if (followThrough && possible) {
-            currentTransaction.setReceipt(coinBank.checkout(currentTransaction));
-            outputMessage = currentTransaction.getMessages();
-            receipt = currentTransaction;
+            coinBank.checkout(currentTransaction);
+            outputMessage.addAll(currentTransaction.getMessages());
+            for(String str: outputMessage){
+                System.out.println(str);
+            }
+            currentTransaction.transferDetails(receipt);
+
+            int bought;
+            for(int i = 0; i < getItemSlots().size(); ++i){
+                bought = receipt.getCartedItems().get(i);
+                for(int j = 0 ; j < bought; ++j){
+                    itemSlots.get(i).removeItem();
+                }
+            }
+
+
+
             newTransaction();
         } else if (followThrough && !possible) {
             outputMessage.add("Machine does not have the appropriate change for this order");

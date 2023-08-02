@@ -26,7 +26,6 @@ public class Factory {
 
     private void startFactory(){
          createPreSetVendingMachines();
-        System.out.println("bug" + vendingList.get(1).getCurrentTransaction().cartedItems.size());
          mainMenu.setupViewElements();
 
          setupButtonLogic();
@@ -37,7 +36,6 @@ public class Factory {
     }
 
     private void setupButtonLogic(){
-        System.out.println(vendingList.size());
          //mainMenu buttons
          mainMenu.setButton_CreateVending(new ActionListener() {
              @Override
@@ -64,9 +62,7 @@ public class Factory {
                 }catch(NumberFormatException error){
                     mainMenu.setLabel_Errors("Invalid Input!");
                 }
-                for(VendingMachine vends: vendingList){
-                    System.out.println(vends.getName());
-                }
+
 
             }
 
@@ -142,6 +138,51 @@ public class Factory {
                 updatePurchased(index);
             }
         });
+        vendingMenu.setCheckoutButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                checkoutItems(index);
+            }
+        });
+
+    }
+
+    public void checkoutItems(int vendingIndex){
+         ArrayList<String> outputMessages = new ArrayList<String>();
+         HashMap<Denomination, Integer> change = new HashMap<Denomination, Integer>();
+         Transaction receipt =  new Transaction(denomList,vendingList.get(vendingIndex).getItemSlots());
+         vendingList.get(vendingIndex).checkout(true, receipt, outputMessages, change);
+
+
+        updatePurchased(vendingIndex);
+
+        HashMap<Integer, Integer> itemsbought = receipt.getCartedItems();
+        ArrayList<String> str_Items = new ArrayList<String>();
+
+        for(int i = 0; i < itemsbought.size(); ++i){
+            if(itemsbought.get(i) > 0){
+                str_Items.add(receipt.getVendingProducts().get(i).getItem().getItemName() + "(" + itemsbought.get(i) + ")");
+                str_Items.add(String.valueOf("PHP " + itemsbought.get(i) * receipt.getVendingProducts().get(i).getPrice()) + " | " + String.valueOf(itemsbought.get(i) * receipt.getVendingProducts().get(i).getItem().getCalories()) + " kcals");
+            }
+        }
+
+        ArrayList<Double> summary = new ArrayList<Double>();
+        summary.add(receipt.getTotalPrice());
+        summary.add(receipt.getTotalDispensed());
+        summary.add(CoinDispenser.countCoins(denomList, change));
+        summary.add(receipt.getTotalCalories());
+
+        ArrayList<String> str_Change = new ArrayList<String>();
+        for(Denomination denom : denomList){
+            if(change.get(denom) > 0){
+                str_Change.add(String.valueOf(denom.getValue()));
+                str_Change.add(String.valueOf(change.get(denom)));
+            }
+        }
+
+
+
+        vendingMenu.showReceipt(str_Items, summary, str_Change, outputMessages);
 
     }
     public void updatePurchased(int vendingIndex){
@@ -150,7 +191,6 @@ public class Factory {
          }
     }
     public void updatePurchased(int index, int vendingIndex){
-         System.out.println("Slot " + index + "vending " + vendingIndex);
          slotViews.get(index).setQuantity(vendingList.get(vendingIndex).getCurrentTransaction().cartedItems.get(index), vendingList.get(vendingIndex).getItemSlots().get(index).getQuantity());
 
          ArrayList<String> ordered = new ArrayList<String>();
@@ -164,23 +204,25 @@ public class Factory {
 
                  currentItem = products.get(i).getItem();
                  ordered.add("•" + " " + currentItem.getItemName() + "(" + number + ")");
-                 ordered.add("PHP" + products.get(i).getPrice() * number + "|" + currentItem.getCalories() * number + "kcals");
+                 ordered.add("PHP " + products.get(i).getPrice() * number + " | " + currentItem.getCalories() * number + " kcals");
              }
          }
 
          ArrayList<String> total = new ArrayList<String>();
-         total.add("Inserted: " + String.valueOf(vendingList.get(vendingIndex).getCurrentTransaction().getTotalDispensed()) + "PHP");
-        total.add("Total: " + String.valueOf(vendingList.get(vendingIndex).getCurrentTransaction().getTotalPrice()) + "PHP");
+         total.add("Inserted: " + String.valueOf(vendingList.get(vendingIndex).getCurrentTransaction().getTotalDispensed()) + " PHP");
+        total.add("Total: " + String.valueOf(vendingList.get(vendingIndex).getCurrentTransaction().getTotalPrice()) + " PHP");
          HashMap<Denomination, Integer> change = new HashMap<Denomination, Integer>();
          change.put(denomList.get(0), 1000);
-         if(vendingList.get(vendingIndex).checkout(false, null, null, change) && CoinDispenser.countCoins(denomList,change) >= 0) {
-             System.out.println("This much: " + CoinDispenser.countCoins(denomList, change));
-             total.add("Change" + CoinDispenser.countCoins(denomList, change) + "PHP");
+         double actualChange = 0;
+         if(vendingList.get(vendingIndex).checkout(false, null, null, change) && (actualChange = CoinDispenser.countCoins(denomList,change)) >= 0 && vendingList.get(vendingIndex).getCurrentTransaction().getTotalPrice() > 0) {
+             total.add("Change: " + actualChange + " PHP");
+             vendingMenu.setCheckoutButton(true);
          }
          else{
              total.add("");
+             vendingMenu.setCheckoutButton(false);
          }
-        total.add("Total: " + String.valueOf(vendingList.get(vendingIndex).getCurrentTransaction().getTotalCalories()) + "kcals");
+        total.add("Total: " + String.valueOf(vendingList.get(vendingIndex).getCurrentTransaction().getTotalCalories()) + " kcals");
 
          vendingMenu.updateTransaction(ordered, total);
     }
@@ -212,21 +254,25 @@ public class Factory {
         regular.addSlot(pineapple, 60, 1, messages);
 
         Item watermelon = new Item("Watermelon Shavings", 60);
+        messages = new ArrayList<Message>();
         messages.add(new Message("Shaving watermelon...", 4));
         messages.add(new Message("Placing watermelon shavings...", 1));
         regular.addSlot(watermelon, 30, 1, messages);
 
         Item orange = new Item("Orange Slices", 94);
+        messages = new ArrayList<Message>();
         messages.add(new Message("Slicing oranges...", 4));
         messages.add(new Message("Placing orange slices...", 1));
         regular.addSlot(orange, 50, 1, messages);
 
         Item grape = new Item("Grape Skin", 30);
+        messages = new ArrayList<Message>();
         messages.add(new Message("Peeling grapes...", 4));
         messages.add(new Message("Placing grape skin...", 1));
         regular.addSlot(grape, 20, 1, messages);
 
         Item melon = new Item("Melon Cubes", 75);
+        messages = new ArrayList<Message>();
         messages.add(new Message("Slicing melon into cubes...", 4));
         messages.add(new Message("Placing melon cubes...", 1));
         regular.addSlot(melon, 75, 1, messages);
@@ -283,13 +329,14 @@ public class Factory {
         messages.add(new Message("Spreading sausage...", 5));
         specialSlots.add(new Slot(sausage,10, 45, 0, messages));
 
-        Item pizza = new Item("Transfrom to Pizza", 500);
+        Item pizza = new Item("Transform to Pizza", 500);
         messages = new ArrayList<Message>();
         messages.add(new Message("Pizza Served...", 0));
         messages.add(new Message("Letting pizza cool a bit...", 2));
         messages.add(new Message("Baking Pizza...", 3));
         messages.add(new Message("Topping cheese...", 6));
         messages.add(new Message("Applying tomato sauce...", 7));
+        messages.add(new Message("Shaping dough...", 8));
         specialSlots.add(new Slot(pizza,10, 45, 3, messages));
 
          vendingList.add(new SpecialVendingMachine("Fruit Pizza!", 10, 10, denomList, specialSlots));

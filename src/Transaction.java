@@ -96,6 +96,10 @@ public class Transaction {
         return totalDispensed;
     }
 
+    public void setTotalDispensed(double totalDispensed) {
+        this.totalDispensed = totalDispensed;
+    }
+
     public HashMap<Denomination, Integer> getCoinCollection(){
         return coinCollection;
     }
@@ -104,12 +108,35 @@ public class Transaction {
         return cartedItems;
     }
 
+    public void transferDetails(Transaction receipt) {
+        receipt.setCartedItems(getCartedItems());
+        receipt.setTotalCalories(getTotalCalories());
+        receipt.setTotalDispensed(getTotalDispensed());
+        receipt.setTotalPrice(getTotalPrice());
+    }
+
+    public void setCartedItems(HashMap<Integer, Integer> cartedItems) {
+        this.cartedItems = cartedItems;
+    }
+
     public double getTotalCalories(){
         return totalCalories;
     }
 
+    public void setTotalCalories(double totalCalories) {
+        this.totalCalories = totalCalories;
+    }
+
     public double getTotalPrice(){
         return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public ArrayList<Slot> getVendingProducts() {
+        return vendingProducts;
     }
 
     public void setReceipt(HashMap<Denomination, Integer> change){
@@ -132,6 +159,7 @@ public class Transaction {
         for(int i = 0; i < vendingProducts.size(); ++i){
             if(cartedItems.get(i) > 0){
                 ArrayList<Message> tempMessages = vendingProducts.get(i).getMessages();
+
                 for(Message tempMessage: tempMessages){
                     if(object_outputMessages.size() == 0){
                         object_outputMessages.add(tempMessage);
@@ -152,9 +180,12 @@ public class Transaction {
             }
         }
 
-        for(Message message: object_outputMessages){
-            string_outputMessages.add(message.getMessage());
+        for(int i = object_outputMessages.size()-1 ; i >= 0; --i){
+            string_outputMessages.add(object_outputMessages.get(i).getMessage());
         }
+//        for(Message message: object_outputMessages){
+//            string_outputMessages.add(message.getMessage());
+//        }
 
         return string_outputMessages;
     }

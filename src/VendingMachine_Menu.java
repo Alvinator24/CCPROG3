@@ -3,13 +3,13 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class VendingMachine_Menu extends JFrame {
 
-    GridBagConstraints gbc;
     JPanel slotPanel;
     JPanel transactionPanel;
     JPanel transactionBought;
@@ -219,6 +219,69 @@ public class VendingMachine_Menu extends JFrame {
 
     }
 
+    public void showReceipt(ArrayList<String> ordered, ArrayList<Double> summary, ArrayList<String> change, ArrayList<String> messages){
+        JFrame receipt = new JFrame();
+        JPanel orders = new JPanel(new MigLayout("wrap 2, fillx", "[]20[]"));
+        JScrollPane ordersScroll = new JScrollPane(orders);
+        JPanel changePanel = new JPanel(new MigLayout("fillx, wrap 2"));
+        JScrollPane changeScroll = new JScrollPane(changePanel);
+        JLabel messageLabel = new JLabel();
+        receipt.setLayout(new MigLayout("fillx", "[][][]30[]"));
+
+        for(int i = 0; i < ordered.size(); ++i){
+            if(i % 2 == 0){
+                orders.add(new JLabel("•" + ordered.get(i)));
+            }
+            else{
+                orders.add(new JLabel(ordered.get(i)), "align right");
+            }
+        }
+
+        for(int i = 0 ; i < change.size(); ++i){
+            if(i % 2 == 0){
+                changePanel.add(new JLabel("PHP " + change.get(i)));
+            }
+            else{
+                changePanel.add(new JLabel("| Count: " + change.get(i)), "align right");
+            }
+        }
+
+
+        receipt.add(new JLabel("Total: " + String.valueOf(summary.get(0)) + " PHP"),"wrap");
+        receipt.add(new JLabel("Received: " + String.valueOf(summary.get(1)) + " PHP"),"wrap");
+        receipt.add(new JLabel("Total Calories: " + String.valueOf(summary.get(3))),"wrap");
+        receipt.add(new JLabel("Change: " + String.valueOf(summary.get(2)) + " PHP"), "cell 1 3");
+
+        receipt.add(ordersScroll, "cell 0 3");
+        receipt.add(changeScroll, "cell 1 3, wrap");
+        //receipt.add(messageLabel);
+
+
+
+        Timer updateLabel = new Timer(1000, new ActionListener() {
+            int counter = 0;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(counter < messages.size()){
+                    System.out.println(messages.get(counter));
+                    receipt.add(new JLabel(messages.get(counter)), "wrap");
+                    ++counter;
+                    SwingUtilities.updateComponentTreeUI(receipt);
+                    receipt.pack();
+                }
+            }
+        });
+
+        updateLabel.start();
+
+
+
+
+        receipt.pack();
+        receipt.setVisible(true);
+
+    }
+
     public double getSelectedDenom(){
         return Double.parseDouble((String)denomDropDown.getSelectedItem());
     }
@@ -234,7 +297,6 @@ public class VendingMachine_Menu extends JFrame {
         ActionListener[] actns = vendingDropDown.getActionListeners();
         vendingDropDown = new JComboBox<>(vendingArr);
         for(ActionListener actn: actns){
-            System.out.println("this");
             vendingDropDown.addActionListener(actn);
         }
         refreshElements();
@@ -255,7 +317,15 @@ public class VendingMachine_Menu extends JFrame {
     }
 
     public void setCheckoutButton(ActionListener actn) {
+        ActionListener[] num = checkoutButton.getActionListeners();
+        if(num.length > 0){
+            checkoutButton.removeActionListener((ActionListener)Array.get(num, 0));
+        }
         checkoutButton.addActionListener(actn);
+    }
+
+    public void setCheckoutButton(boolean state){
+        checkoutButton.setEnabled(state);
     }
 
     public void setResetButton(ActionListener actn) {
@@ -269,20 +339,16 @@ public class VendingMachine_Menu extends JFrame {
     public void setVendingDropDown(ArrayList<String> vendingNames){
         removeElements();
         String[] strNames = vendingNames.toArray(new String[vendingNames.size()]);
-        for(String str: strNames){
-            System.out.println(str);
-        }
+
         ActionListener[] actns = vendingDropDown.getActionListeners();
         vendingDropDown = new JComboBox<>(strNames);
         for(ActionListener actn: actns){
-            System.out.println("this");
             vendingDropDown.addActionListener(actn);
         }
 
         refreshElements();
     }
     public void setVendingDropDown(ActionListener actn){
-        System.out.println("that");
         vendingDropDown.addActionListener(actn);
     }
 

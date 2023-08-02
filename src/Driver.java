@@ -125,9 +125,6 @@ public class Driver {
     public static void main(String[] args){
 
         ArrayList<Denomination> denoms = new ArrayList<Denomination>();
-        denoms.add(new Denomination(.01));
-        denoms.add(new Denomination(.05));
-        denoms.add(new Denomination(.1));
         denoms.add(new Denomination(.25));
         denoms.add(new Denomination(1));
         denoms.add(new Denomination(5));

@@ -9,7 +9,7 @@ public class CoinDispenser {
         this.denomList = denomList;
 
         for(Denomination denom : this.denomList){
-            coinCollection.put(denom, 10); //our factory arbitrarily provides the vending machines with 10 coins
+            coinCollection.put(denom, 100); //our factory arbitrarily provides the vending machines with 10 coins
         }
 
     }
@@ -46,7 +46,7 @@ public class CoinDispenser {
             change.put(denom, 0);
         }
 
-        change = simulateCheckout(transaction.getCoinCollection(), newBank, transaction);
+        //change = simulateCheckout(transaction.getCoinCollection(), newBank, transaction);
         coinCollection = newBank;
 
         return change;
