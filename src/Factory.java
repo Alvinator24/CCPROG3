@@ -310,8 +310,11 @@ public class Factory {
         }
         String[] str_slots = slots.toArray(new String[0]);
         maintenanceMenu.setSlotDropDown(str_slots);
-        maintenanceMenu.setRestockItem_itemQuantity(vendingList.get(index).getItemSlots().get(0).getQuantity());
-        maintenanceMenu.setRestockItem_Price(vendingList.get(index).getItemSlots().get(0).getPrice());
+        if(index < 2){
+            maintenanceMenu.setRestockItem_itemQuantity(vendingList.get(index).getItemSlots().get(0).getQuantity());
+            maintenanceMenu.setRestockItem_Price(vendingList.get(index).getItemSlots().get(0).getPrice());
+        }
+
 
 
     }
@@ -361,7 +364,7 @@ public class Factory {
          }
     }
     public void updatePurchased(int index, int vendingIndex){
-         slotViews.get(index).setQuantity(vendingList.get(vendingIndex).getCurrentTransaction().cartedItems.get(index), vendingList.get(vendingIndex).getItemSlots().get(index).getQuantity());
+         slotViews.get(index).setQuantity(vendingList.get(vendingIndex).getCurrentTransaction().getCartedItems().get(index), vendingList.get(vendingIndex).getItemSlots().get(index).getQuantity());
 
          ArrayList<String> ordered = new ArrayList<String>();
          ArrayList<Slot> products = vendingList.get(vendingIndex).getItemSlots();

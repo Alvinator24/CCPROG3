@@ -1,9 +1,19 @@
 import java.util.*;
+/**
+ * This class represents a coin dispenser for managing coin collections
+ * and dispensing coins in a Vending Machine.
+ */
 public class CoinDispenser {
     
-    private ArrayList<Denomination> denomList;
-     HashMap<Denomination, Integer> coinCollection;  //make private
-    
+    private final ArrayList<Denomination> denomList;
+    private HashMap<Denomination, Integer> coinCollection;
+
+    /**
+     * Constructs a new CoinDispenser with the specified denomination list.
+     *
+     * @param denomList The list of denominations supported by the coin dispenser.
+     */
+
     public CoinDispenser(ArrayList<Denomination> denomList){
         coinCollection = new HashMap<Denomination, Integer>();
         this.denomList = denomList;
@@ -15,6 +25,12 @@ public class CoinDispenser {
     }
 
 
+    /**
+     * Retrieves the denomination object corresponding to the given coin value.
+     *
+     * @param value The value of the coin for which the denomination is sought.
+     * @return  The denomination object for the given coin value, or null if not found.
+     */
     public Denomination getDenom(double value){
         Denomination denomFound = null;
 
@@ -28,16 +44,33 @@ public class CoinDispenser {
 
 
 
-    // adds coins to the machine
+    /**
+     * Dispenses a coin of the specified denomination and updates the coin collection.
+     *
+     * @param denom The denomination of the coin to be dispensed.
+     */
     public void dispenseCoin(Denomination denom){
         int coinCount = coinCollection.get(denom) + 1;
         coinCollection.put(denom, coinCount);
     }
 
+    /**
+     * Dispenses a coin based on the given coin value and updates the coin collection.
+     *
+     * @param coin  The value of the coin to be dispensed.
+     */
     public void dispenseCoin(double coin){
         dispenseCoin(getDenom(coin));
     }
 
+    /**
+     * Calculates and returns the change to be dispensed based on the provided
+     * transaction details.
+     *
+     * @param transaction   The transaction for which the change is to be calculated.
+     * @return  A HashMap containing the denominations of coins and their quantities
+     *          as change.
+     */
     public HashMap<Denomination, Integer> checkout(Transaction transaction){
         HashMap<Denomination, Integer> change = new HashMap<Denomination, Integer>();
         HashMap<Denomination, Integer> newBank = simulateTemporaryCoinCollection(transaction.getCoinCollection());
@@ -52,6 +85,13 @@ public class CoinDispenser {
         return change;
     }
 
+    /**
+     * Simulates the temporary coin collection after the transaction
+     * based on the given pouch.
+     *
+     * @param givenPouch    The original coin pouch from the transaction.
+     * @return  A HashMap representing the temporary coin collection.
+     */
     public HashMap<Denomination, Integer> simulateTemporaryCoinCollection(HashMap<Denomination, Integer> givenPouch)
     {
         HashMap<Denomination, Integer> temporaryBank = new HashMap<Denomination, Integer>();
@@ -61,6 +101,16 @@ public class CoinDispenser {
         return temporaryBank;
 
     }
+
+    /**
+     * Simulates the checkout process to calculate the possible change for the transaction.
+     *
+     * @param givenPouch    The original coin pouch from the transaction.
+     * @param simulatedBank The simulated temporary coin collection.
+     * @param transaction   The transaction for which change is being calculated.
+     * @return  A HashMap containing the denominations of coins and their quantities
+     *          as possible change.
+     */
 
     public HashMap<Denomination, Integer> simulateCheckout(HashMap<Denomination, Integer> givenPouch, HashMap<Denomination, Integer> simulatedBank, Transaction transaction) {
         boolean enoughChange = true;
@@ -105,6 +155,13 @@ public class CoinDispenser {
         return possibleChange;
     }
 
+    /**
+     * Dispenses all of the coins based on the given coin pouch
+     * and updates the coin collection.
+     *
+     * @param coinPouch A HashMap containing the denominations of coins
+     *                  and their quantities.
+     */
     public void dispenseCoin(HashMap<Denomination, Integer> coinPouch){
         for(Denomination denom : denomList){
             int number = coinPouch.get(denom);
@@ -116,10 +173,14 @@ public class CoinDispenser {
 
     }
 
-
-
-
-
+    /**
+     * Counts and returns the total value of coins based on the given coin pouch
+     * and denomination list.
+     *
+     * @param denomList The list of denominations used to calculate the total value.
+     * @param coinPouch A HashMap containing the denominations of coins and their quantities.
+     * @return The total value of coins in the coin pouch.
+     */
     public static double countCoins(ArrayList<Denomination> denomList, HashMap<Denomination, Integer> coinPouch){
         double total = 0;
 
@@ -137,7 +198,13 @@ public class CoinDispenser {
 
     }
 
-    // removed coins from denominations until 10 is left;
+    /**
+     * Removes excess coins from denominations until 10 coins are left
+     * in the coin collection.
+     *
+     * @return  A HashMap representing the change with removed
+     *          excess coins from denominations.
+     */
     public HashMap<Denomination, Integer> emptyMachine(){
         HashMap<Denomination, Integer> change = new HashMap<Denomination, Integer>();
         int numOfCoins;
@@ -153,6 +220,12 @@ public class CoinDispenser {
         return change;
     }
 
+    /**
+     * Allows other classes to access the vending machine's coin
+     * collection
+     *
+     * @return  the vending machine's coin collection
+     */
     public HashMap<Denomination, Integer> getCoinCollection() {
         return coinCollection;
     }
