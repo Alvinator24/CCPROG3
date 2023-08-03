@@ -8,6 +8,9 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+/**
+ * This class creates the GUI of the Vending Machine tester application.
+ */
 public class VendingMachine_Menu extends JFrame {
 
     JPanel slotPanel;
@@ -25,6 +28,14 @@ public class VendingMachine_Menu extends JFrame {
     JButton checkoutButton;
     JButton resetButton;
     JButton maintenance;
+
+    /**
+     * Constructs a new VendingMachine_Menu instance with the specified
+     * list of denominations.
+     *
+     * @param denomList The list of denominations to populate the
+     *                  denominations drop-down menu.
+     */
     VendingMachine_Menu(ArrayList<Denomination> denomList){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new MigLayout());
@@ -51,6 +62,9 @@ public class VendingMachine_Menu extends JFrame {
 
     }
 
+    /**
+     * Sets up the GUI elements and layout for the vending machine menu.
+     */
     private void setupElements(){
 
         createNewTransaction();
@@ -75,7 +89,9 @@ public class VendingMachine_Menu extends JFrame {
 
 
     }
-
+    /**
+     * Removes all the elements from the vending machine menu.
+     */
     public void removeElements(){
         remove(vendingDropDown);
         remove(exitButton);
@@ -88,8 +104,10 @@ public class VendingMachine_Menu extends JFrame {
         remove(resetButton);
         remove(maintenance);
     }
+    /**
+     * Refreshes the GUI elements in the vending machine menu.
+     */
     public void refreshElements(){
-        //setVisible(false);
         add(vendingDropDown);
         add(exitButton);
         add(transactionPanel, "cell 5 0, span 1 3, wrap");
@@ -106,13 +124,13 @@ public class VendingMachine_Menu extends JFrame {
         add(maintenance);
         pack();
 
-        //SwingUtilities.updateComponentTreeUI(this);
-//        setVisible(false);
-//        setVisible(true);
-
 
     }
 
+    /**
+     * Creates a new transaction panel with the appropriate elements
+     * and layout.
+     */
     public void createNewTransaction(){
         transactionPanel = new JPanel();
         transactionPanel.setLayout(new MigLayout());
@@ -143,6 +161,13 @@ public class VendingMachine_Menu extends JFrame {
 
     }
 
+    /**
+     * Updates the transaction panel with the purchased items
+     * and transaction totals.
+     *
+     * @param purchased The list of purchased items to be displayed.
+     * @param totals    The list of transaction totals to be displayed.
+     */
     public void updateTransaction(ArrayList<String> purchased, ArrayList<String> totals){
         transactionPanel.remove(transactionScroll);
 
@@ -193,10 +218,17 @@ public class VendingMachine_Menu extends JFrame {
         //setVisible(true);
     }
 
-
+    /**
+     * Adds a slot panel to the vending machine menu.
+     *
+     * @param slot  The JPanel representing the slot to be added.
+     */
     public void addSlot(JPanel slot){
         slotPanel.add(slot);
     }
+    /**
+     * Refreshes the slot panel in the vending machine menu.
+     */
     public void refreshSlotPanel(){
         removeElements();
         slotPanel = new JPanel();
@@ -217,11 +249,12 @@ public class VendingMachine_Menu extends JFrame {
     }
 
     /**
+     * Creates and displays the panel showing the receipt
      *
-     * @param ordered
-     * @param summary
-     * @param change
-     * @param messages
+     * @param ordered list of items ordered
+     * @param summary information on the total cost and calories
+     * @param change information on the denomination given for change
+     * @param messages list of messages ot be displayed
      */
     public void showReceipt(ArrayList<String> ordered, ArrayList<Double> summary, ArrayList<String> change, ArrayList<String> messages){
         JFrame receipt = new JFrame();
@@ -286,27 +319,22 @@ public class VendingMachine_Menu extends JFrame {
 
     }
 
+    /**
+     * Retrieves the selected denomination from the denominations
+     * drop-down menu.
+     *
+     * @return  The selected denomination as a double value.
+     */
     public double getSelectedDenom(){
         return Double.parseDouble((String)denomDropDown.getSelectedItem());
     }
 
 
-    //replaced by setVending?
-    public void addVending(ArrayList<VendingMachine> vendingList){
-        ArrayList<String> vendingMachines = new ArrayList<String>();
-        for(VendingMachine vending: vendingList){
-            vendingMachines.add(vending.getName());
-        }
-
-        String[] vendingArr = vendingMachines.toArray(new String[vendingMachines.size()]);
-        ActionListener[] actns = vendingDropDown.getActionListeners();
-        vendingDropDown = new JComboBox<>(vendingArr);
-        for(ActionListener actn: actns){
-            vendingDropDown.addActionListener(actn);
-        }
-        refreshElements();
-    }
-
+    /**
+     * Sets the ActionListener for the "Insert" coin button.
+     *
+     * @param actn  The ActionListener to be set for the button.
+     */
     public void setInsertCoin(ActionListener actn) {
         ActionListener[] num = insertCoin.getActionListeners();
         if(num.length > 0){
@@ -317,10 +345,20 @@ public class VendingMachine_Menu extends JFrame {
 
     }
 
+    /**
+     * Sets the ActionListener for the "Exit" button.
+     *
+     * @param actn  The ActionListener to be set for the button.
+     */
     public void setExitButton(ActionListener actn) {
         exitButton.addActionListener(actn);
     }
 
+    /**
+     * Sets the ActionListener for the "Checkout" button.
+     *
+     * @param actn  The ActionListener to be set for the button.
+     */
     public void setCheckoutButton(ActionListener actn) {
         ActionListener[] num = checkoutButton.getActionListeners();
         if(num.length > 0){
@@ -329,18 +367,41 @@ public class VendingMachine_Menu extends JFrame {
         checkoutButton.addActionListener(actn);
     }
 
+    /**
+     * Allows enabling and disabling of checkout button
+     *
+     * @param state  whether button should be enabled or disabled
+     */
     public void setCheckoutButton(boolean state){
         checkoutButton.setEnabled(state);
     }
-
+    /**
+     * Sets the ActionListener for the "Clear Transaction" button.
+     *
+     * @param actn  The ActionListener to be set for the button.
+     */
     public void setResetButton(ActionListener actn) {
         resetButton.addActionListener(actn);
     }
 
+    /**
+     * Retrieves the JComboBox representing the vending machines
+     * drop-down menu.
+     *
+     * @return  The JComboBox representing the vending machines
+     *          drop-down menu.
+     */
     public JComboBox getVendingDropDown() {
         return vendingDropDown;
     }
 
+    /**
+     * Sets the vending machines drop-down menu with the provided
+     * list of vending names.
+     *
+     * @param vendingNames  The list of vending machine names to be
+     *                      displayed in the drop-down menu.
+     */
     public void setVendingDropDown(ArrayList<String> vendingNames){
         removeElements();
         String[] strNames = vendingNames.toArray(new String[vendingNames.size()]);
@@ -353,32 +414,40 @@ public class VendingMachine_Menu extends JFrame {
 
         refreshElements();
     }
+    /**
+     * Sets the ActionListener for the vending machines drop-down menu.
+     *
+     * @param actn  The ActionListener to be set for the drop-down menu.
+     */
     public void setVendingDropDown(ActionListener actn){
         vendingDropDown.addActionListener(actn);
     }
 
-//    public void setTransaction(String transaction) {
-//        if(transaction == null){
-//            this.transaction.setVerticalAlignment(JLabel.CENTER);
-//            this.transaction.setHorizontalAlignment(JLabel.CENTER);
-//            this.transaction.setText("ADD ITEMS TO START TRANSACTION");
-//        }
-//        else{
-//            this.transaction.setVerticalAlignment(JLabel.NORTH);
-//            this.transaction.setHorizontalAlignment(JLabel.WEST);
-//            this.transaction.setText(transaction);
-//        }
-//
-//    }
-
+    /**
+     * Sets the name of the vending machine to be displayed in
+     * the transaction panel.
+     *
+     * @param machineName   The name of the vending machine.
+     */
     public void setMachineName(String machineName) {
         this.machineName.setText(machineName);
     }
 
+    /**
+     * Adds an action listener to the maintenance button
+     *
+     * @param actn The action listener to be added
+     */
     public void setMaintenance(ActionListener actn) {
         maintenance.addActionListener(actn);
     }
 
+    /**
+     * Sets the visibility of the vending machine menu based on
+     * the provided mode.
+     *
+     * @param mode The mode (0 to hide, 1 to show).
+     */
     public void setMenu(int mode){
         switch(mode){
             case 0 ->{
