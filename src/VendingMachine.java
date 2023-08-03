@@ -1,305 +1,360 @@
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.Scanner;
-
+/**
+ * This class is where a regular VendingMachine class will be created
+ * and where the SpecialVendingMachine class will inherit most of its traits.
+ */
 public class VendingMachine {
 
     private String name;
-    private int slotLimit;
+    protected int slotLimit;
     private int itemLimit;
-    private String password;
-    Transaction currentTransaction; //make private
+    protected Transaction currentTransaction; //make private
 
-    CoinDispenser coinBank;
+    private CoinDispenser coinBank;
 
-    private ArrayList<Slot> itemSlots;
+    protected ArrayList<Slot> itemSlots; //make private
     private ArrayList<Denomination> denom;
 
-    // TODO: MAKE SURE DRIVER CODE DOES NOT PASS LESS THAN MINIMUM NUMBER OF SLOTS
-    // AND ITEMS
+     private HashMap<Integer, Integer> inventoryCount;
+
+    /**
+     * Constructs an instance of a regular Vending Machine and its
+     * components.
+     *
+     * @param name      Name of the Vending Machine being created.
+     * @param slotLimit Limit of slots that each Vending Machine can have.
+     * @param itemLimit Limit of items that each slot can hold.
+     * @param denoms    Collection of denominations for the currency the
+     *                  Vending Machine accepts.
+     */
+
     VendingMachine(String name, int slotLimit, int itemLimit, ArrayList<Denomination> denoms) {
         this.name = name;
         this.slotLimit = slotLimit;
         this.itemLimit = itemLimit;
-        password = "admin";
         itemSlots = new ArrayList<Slot>();
         coinBank = new CoinDispenser(denoms);
-        
+        inventoryCount = new HashMap<Integer, Integer>();
+
+
         denom = denoms;
-
-        
-        // TODO: initialize denomm
-
         newTransaction();
+
     }
 
-    VendingMachine(String name, int slotLimit, int itemLimit, ArrayList<Denomination> denoms, String password) {
-        this.name = name;
-        this.slotLimit = slotLimit;
-        this.itemLimit = itemLimit;
-        this.password = password;
-        itemSlots = new ArrayList<Slot>();
-        coinBank = new CoinDispenser(denoms);
-
-        denom = new ArrayList<Denomination>();
-
-        newTransaction();
-    }
-
-    public boolean addItem(Item item) { 
-        boolean isSuccessul = false;
-        Slot found = getSlot(item);
-
-       if(found == null){
-           if(itemSlots.size() < slotLimit){
-               Slot slot = new Slot(item, itemLimit);
-               itemSlots.add(slot);
-               isSuccessul = true;
-
-           }
-       }
-       else{
-           System.out.println("Slot for item already exists");
-       }
-
-
-        return isSuccessul;
-    }
-
-    // make it static (list of slots, since irl u dont change it once it's made)
-    // get the index from the user (n - 1, since it starts from 0)
-    
-    public boolean restockItem(Item item) {
-        boolean isSuccessful =  false;
-        Slot found = getSlot(item);
-        if(found != null){
-            if(found.getQuantity() < itemLimit){
-                found.addItem(item);
-            }
-         isSuccessful = true;
+    /**
+     * Attempts to add a new slot to the Vending Machine if such
+     * a move is possible.
+     *
+     * @param item      Name of the item that the slot is meant to hold.
+     * @param price     Price of the item that is being added.
+     * @param itemType  Identifies the type of item being added to the slot.
+     * @param messages  The messages created for the items in the given slot.
+     *
+     * @return  True if the attempt is successful and the slot is added,
+     *          false if otherwise.
+     */
+    public boolean addSlot(Item item, double price, int itemType ,ArrayList<Message> messages) {  //change to slot number
+        boolean isSuccessful = false;
+        if (itemSlots.size() < slotLimit) {
+            itemSlots.add(new Slot(item, itemLimit, price, itemType, messages));
+            isSuccessful = true;
         }
-        else{
-            System.out.println("Item isn't registered into vending machine");
+        newTransaction();;
+
+        if(!inventoryCount.containsKey(itemSlots.size() - 1)){
+            inventoryCount.put(itemSlots.size()-1, 0);
         }
+        refreshInventoryCount();
         return isSuccessful;
     }
 
-    public void restockCash(double cash) {
-        coinBank.dispenseCoin(cash);
-    }
-
-    public boolean removeItem(int slotNum) { //change to private (make maintenance method w password)
-        boolean isSuccesful = false;
-        --slotNum;
-        Slot slot = itemSlots.get(slotNum);
-        if(slot.getQuantity() == 0){
-            System.out.println("Slot already empty");
-
+    /**
+     * Attempts to remove an existing slot to the Vending Machine
+     * if such a move is possible.
+     *
+     * @param index Index of the slot that is being removed.
+     *
+     * @return  True if the slot exists and is successfully removed,
+     *          false if othewise.
+     */
+    public boolean removeSlot(int index) {
+        boolean isSuccessful = false;
+        if (index >= 0 && index < itemSlots.size()) {
+            itemSlots.remove(index);
+            isSuccessful = true;
         }
-        else{
-            slot.removeItem();
-            isSuccesful = true;
-        }
-        return  isSuccesful;
-    }
-
-    public Slot getSlot(Item item) {
-        Slot slot = null;
-        for (Slot i: itemSlots) {
-            if(i.getItem().getItemName().equals(item.getItemName()) && i.getItem().getPrice() == item.getPrice() && i.getItem().getCalories() == item.getCalories()) {
-                slot = i;
-            }
-        }
-        return slot;
-    }
-
-
-
-    public boolean purchaseItem(int slotNum) {
-        boolean success = false;
-        if(slotNum < itemSlots.size()) {
-
-            Item item = itemSlots.get(slotNum-1).getItem();
-            int itemsWanted = currentTransaction.getItemQuantity(item) + 1;
-            if(getAvailability(item, itemsWanted)){
-                currentTransaction.addItem(item);
-                success = true;
-            }
-        }
-        return success;
-
-    }
-
-
-    public boolean dispenseCoin(double valueInserted){
-        return currentTransaction.dispenseCoin(valueInserted);
-
-    }
-
-    public boolean displayTransaction() {
-        double change = 0;
-        boolean readyForCheckout = false;
-        int index = 0;
-
-        HashMap<Denomination, Integer> projectedChange = new HashMap<Denomination, Integer>();
-        for(Denomination s : denom){
-            projectedChange.put(s, 0);
-        }
-
-
-        for(Item item: currentTransaction.getCartedItems()){
-            ++index;
-            double itemPrice = item.getPrice();
-            double itemCalories = item.getCalories();
-
-
-            System.out.println("["+index+ "]" + item.getItemName() + "(" + itemCalories + " cals)");
-            System.out.println(itemPrice);
-        }
-
-        System.out.println("----------------");
-        System.out.println("Total Price: " + currentTransaction.getTotalPrice() + " | Total Calories : " + currentTransaction.getTotalCalories());
-
-        System.out.println("Amount inserted: " + currentTransaction.getTotalDispensed());
-        if(currentTransaction.getTotalDispensed() >= currentTransaction.getTotalPrice()) {
-            //print change
-            if (coinBank.checkout(currentTransaction, projectedChange, false)) ;
-            {
-                readyForCheckout = true;
-                for (Denomination s : denom) {
-                    change += projectedChange.get(s) * s.getValue();
-                }
-
-                System.out.println("Change: " + change);
-
-            }
-        }
-        return readyForCheckout;
-    }
-
-    public boolean haveChange(){ //FINISH
-        boolean enoughChange = false;
-
-
-        return enoughChange;
-    }
-
-
-    public void newTransaction(){
-        currentTransaction = new Transaction(denom);
-    }
-
-    public void addCash(int test) {
-
-    }
-
-    public void checkout(boolean followThrough){
-        HashMap<Denomination, Integer> change = new HashMap<Denomination, Integer>();
-        for(Denomination s : denom){
-            change.put(s, 0);
-        }
-
-        if(followThrough){
-            if(coinBank.checkout(currentTransaction, change,true)){
-
-                System.out.println("\n\nThank you for your purchase!");
-                System.out.println("===================");
-                System.out.println("Summary of purchase");
-                for(Item item : currentTransaction.getCartedItems()){
-                    System.out.println("Item: " + item.getItemName());
-                    System.out.println("Price: " + item.getPrice());
-                    System.out.println("Calories: " + item.getCalories());
-                    System.out.println("-------------------");
-                }
-                System.out.println("===================");
-                System.out.println("Total Price: " + currentTransaction.getTotalPrice() + " | Total Calories: " + currentTransaction.getTotalCalories());
-
-                System.out.println("\n\n*Change given*");
-                for(Denomination s : denom){
-                    System.out.println(s.getValue() + " : " + change.get(s));
-                }
-            }
-            else{
-                System.out.println("Error dispensing change | maybe called when displayTransaction() returned false");
-            }
-        }
-        System.out.println("Thank you!\n");
         newTransaction();
-
+        refreshInventoryCount();
+        return isSuccessful;
     }
 
-    public void displayItems() {
-        int slotNum = 0;
-        for(Slot s : itemSlots){
-            ++slotNum;
-            String name = s.getItem().getItemName();
-            double price = s.getItem().getPrice();
-            double calories = s.getItem().getCalories();
+    /**
+     * Attempts to restock an item in the Vending Machine by accessing
+     * its corresponding slot.
+     *
+     * @param adjustments   The values for the new stock of items being added.
+     *
+     * @return Whether the algorithm successfully restocked the items
+     */
+    public boolean restockItem(HashMap<Integer, Integer> adjustments) { //change to slot number
+        boolean allGood = true;
 
-            System.out.println("------------------");
-            System.out.println("Slot " + slotNum);
-            System.out.println("Item: " + name);
-            System.out.println("Price: " + price);
-            System.out.println("Calories: " + calories);
-            System.out.println("Available: |" + s.getQuantity() + "|");
-        }
-    }
-
-    public boolean getAvailability(Item item, int numberOfOrders) {
-        boolean available = false;
-        if(getSlot(item).getQuantity() >= numberOfOrders) {
-            available = true;
-        }
-        return available;
-    }
-
-    public void maintenance(String password){
-        Scanner myObj = new Scanner(System.in);  // Create a Scanner object
-
-
-        if(password.equals(this.password)){
-            System.out.println("[1] Restock\n [2] Print Summary\n [3] Refill Denominations\n [4] Withdraw Cash");
-            int choice = myObj.nextInt();
-
-            switch(choice){
-                case 1: {
-
-                    System.out.println("Enter item name: ");
-                    String myObj2 =  myObj.nextLine();
-
-                    System.out.println("Enter price: ");
-                    double myObj3 =  myObj.nextDouble();
-
-                    System.out.println("Enter Calories: ");
-                    double myObj4 =  myObj.nextDouble();
-
-                    restockItem(new Item(myObj2, myObj3, myObj4));
-                    break;
+        for(int i = 0; i < itemSlots.size(); ++i){
+            if(adjustments.get(i) > 0){
+                for(int j = 0; j < adjustments.get(i); ++j){
+                    if (itemSlots.get(i).addItem() == false) {
+                        allGood = false;
+                    }
                 }
-
-                case 2: {
-
-
-                    break;
-                }
-
-                case 3: {
-                    System.out.println("Enter Denomination Value: ");
-                    double myObj5 =  myObj.nextDouble();
-
-                    dispenseCoin(myObj5);
-
-                    break;
-                }
-
-                case 4: {
-
-                    break;
+            }
+            else if(adjustments.get(i) < 0){
+                for(int j = 0; j < Math.abs(adjustments.get(i)); ++j){
+                    if (itemSlots.get(i).removeItem() == false) {
+                        allGood = false;
+                    }
                 }
             }
         }
-        else{
-            System.out.println("Invalid Password");
+
+        newTransaction();
+        inventoryCount = new HashMap<Integer, Integer>();
+        for(int i = 0; i < itemSlots.size(); ++i){
+            inventoryCount.put(i, 0);
+        }
+
+        return allGood;
+    }
+
+
+    /**
+     * Updates how much was in inventory since last restock
+     *
+     * @param sold   Contains what has been sold and how much of it.
+     **/
+    private void updateInventoryCount(HashMap<Integer, Integer> sold) {
+        refreshInventoryCount();
+
+        for(int i = 0; i < itemSlots.size(); ++i) {
+            inventoryCount.put(i, inventoryCount.get(i) + sold.get(i));
         }
     }
 
+    /**
+     * In case of unaccounted new slots, this updates
+     * how much was in inventory since last restock.
+     **/
+    public void refreshInventoryCount(){
+        for(int i = 0; i < itemSlots.size(); ++i){
+            if(!inventoryCount.containsKey(i)){
+                inventoryCount.put(i, 0);
+            }
+
+        }
+    }
+
+    /**
+     * Restocks the cash inside a Vending Machine whenever cash is
+     * needed.
+     *
+     * @param coinPouch The collection of denominations and their
+     *                  quantities to be added.
+     */
+    public void restockCash(HashMap<Denomination, Integer> coinPouch) {
+        coinBank.dispenseCoin(coinPouch);
+    }
+
+
+    /**
+     * Empties the cash inside a Vending Machine.
+     *
+     * @return The emptied Hashmap holding the cash in the
+     *         Vending Machine.
+     */
+    public HashMap<Denomination, Integer> emptyCoins() {
+        return coinBank.emptyMachine();
+    }
+
+
+    //BELOW ARE FOR ITEM PURCHASING
+
+    /**
+     * This method is used ot purchase items in the vending machine
+     *
+     * @param slotNum   The slot contaning the item that is being purchased.
+     * @return  The item that is being purchased.
+     */
+    public boolean purchaseItem(int slotNum) {
+        return currentTransaction.addItem(slotNum);
+    }
+
+    /**
+     * This method is used to remove items from the user's transaction
+     *
+     * @param slotNum   The slot contaning the item that is being returned.
+     * @return  The item that is being returned..
+     */
+    public boolean removeItem(int slotNum) {
+        return currentTransaction.removeItem(slotNum);
+    }
+
+    /**
+     * This method is used to simulate the user inserting
+     * a coin/bill
+     *
+     * @param valueInserted The value of the money being inserted.
+     * @return The money being inserted.
+     */
+    public boolean dispenseCoin(double valueInserted) {
+        return currentTransaction.dispenseCoin(valueInserted);
+    }
+
+
+    /**
+     * Attempts to perform a checkout for the user in order to finish
+     * the transaction process and provide the change to the user.
+     *
+     * @param followThrough     The truth value of the prior process to see if
+     *                          this method can be carried out.
+     * @param receipt           The reciept made for the order.
+     * @param outputMessage     The collection of messages made for the user
+     *                          while purchasing the items.
+     * @param change            The change the user receives after the transaction.
+     * @return  True if the method is possible and therefore carried out,
+     *          false if otherwise.
+     */
+    public boolean checkout(boolean followThrough, Transaction receipt, ArrayList<String> outputMessage, HashMap<Denomination, Integer> change) {
+        boolean possible = false;
+        HashMap<Denomination,Integer> tempHash = coinBank.simulateCheckout(currentTransaction.getCoinCollection(), null, currentTransaction);
+        if(tempHash != null){
+            for(Denomination denoms: denom){
+                change.put(denoms, tempHash.get(denoms));
+            }
+        }
+
+
+
+        if (tempHash != null) {
+            possible = true;
+        }
+        if (followThrough && possible) {
+            coinBank.checkout(currentTransaction);
+            outputMessage.addAll(currentTransaction.getMessages());
+
+            currentTransaction.transferDetails(receipt);
+            updateInventoryCount(currentTransaction.getCartedItems());
+
+            int bought;
+            for(int i = 0; i < getItemSlots().size(); ++i){
+                bought = receipt.getCartedItems().get(i);
+                for(int j = 0 ; j < bought; ++j){
+                    itemSlots.get(i).removeItem();
+                }
+            }
+
+
+
+            newTransaction();
+        } else if (followThrough && !possible) {
+            outputMessage.add("Machine does not have the appropriate change for this order");
+        }
+
+
+        return possible;
+    }
+
+    /**
+     * Allows other classes to access the name of an item given its slot
+     * index.
+     *
+     * @param index The index of the slot.
+     * @return  The name of the item being accessed.
+     */
+    public String getSlotName(int index) {
+        Item item = itemSlots.get(index).getItem();
+        return item.getItemName();
+    }
+    /**
+     * Allows other classes to access the calorie amount of an item
+     * given its slot index.
+     *
+     * @param index The index of the slot.
+     * @return  The calorie amount of the item being accessed.
+     */
+
+    public double getSlotCalories(int index) {
+        Item item = itemSlots.get(index).getItem();
+        return item.getCalories();
+    } //good
+
+    /**
+     * Allows other classes to access the price of an item given its slot
+     * index.
+     *
+     * @param index The index of the slot.
+     * @return  The price of the item being accessed.
+     */
+    public double getSlotPrice(int index) {
+        return itemSlots.get(index).getPrice();
+    } //good
+
+    /**
+     * Creates a new Transaction class from the Vending Machine.
+     */
+    public void newTransaction() {
+        currentTransaction = new Transaction(denom, itemSlots);
+    }
+
+    /**
+     * Allows other classes to access the list of slots of a
+     * Vending Machine.
+     *
+     * @return  The list of slots of the Vending Machine.
+     */
+    public ArrayList<Slot> getItemSlots() {
+        return itemSlots;
+    }
+
+    /**
+     * Allows other classes to access the name of the
+     * Vending Machine.
+     *
+     * @return The name of the Vending Machine.
+     */
+    public String getName() {
+        return name;
+    }
+
+
+    /**
+     * Allows other classes to access the current Transaction
+     * being made to their corresponding Vending Machine.
+     *
+     * @return  The current transaction being made.
+     */
+    public Transaction getCurrentTransaction() {
+        return currentTransaction;
+    }
+
+    /**
+     * Allows other classes to access inventoryCount,
+     * which stores the items sold since last restock
+     *
+     * @return the items sold since last restock
+     */
+    public HashMap<Integer, Integer> getInventoryCount() {
+        return inventoryCount;
+    }
+
+    /**
+     * Allows other classes to access the vending machine's
+     * coinDispense.
+     *
+     * @return the vending machine's coin dispenser
+     */
+    public CoinDispenser getCoinBank() {
+        return coinBank;
+    }
 }
