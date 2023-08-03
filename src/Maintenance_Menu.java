@@ -6,7 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-
+/**
+ * This class represents the Maintenance Menu of a vending machine.
+ * It provides features for adding items, restocking items and denominations, and emptying the Vending Machine.
+ */
 public class Maintenance_Menu {
 
     JFrame mainFrame;
@@ -43,6 +46,11 @@ public class Maintenance_Menu {
     JButton emptyMachineButton;
     JButton exitButton;
 
+    /**
+     * This constructs an instance of the Maintenance_Menu class.
+     * Initializes the mainFrame and other components for the
+     * maintenance menu.
+     */
     public Maintenance_Menu() {
 
         mainFrame = new JFrame();
@@ -91,6 +99,11 @@ public class Maintenance_Menu {
         // setLocationRelativeTo(null);
 
     }
+    /**
+     * Sets the available slots in the vending machine for restocking items.
+     *
+     * @param slots An array of strings representing the available slots.
+     */
 
     public void setSlotDropDown(String[] slots) {
         restockItemFrame.remove(slotDropDown);
@@ -104,26 +117,55 @@ public class Maintenance_Menu {
 
     }
 
+    /**
+     * Allows other classes to access the index of the slotDropDown.
+     *
+     * @return Integer value of slotDropDown.
+     */
     public int getSlotDropDown() {
         return slotDropDown.getSelectedIndex();
     }
 
+    /**
+     * Changes the price of an item used for restocking
+     *
+     * @param price New price of the item used for restocking.
+     */
     public void setRestockItem_Price(double price) {
         restockItem_Price.setText(String.valueOf(price));
     }
-
+    /**
+     * Allows other classes to get the price of the
+     * restocking item/s.
+     *
+     * @return String of the restocking item's price
+     */
     public String getRestockItem_Price() {
         return restockItem_Price.getText();
     }
-
+    /**
+     * Allows other classes to access the item quantity field
+     * of restockItem.
+     *
+     * @return String of the itemQuantityField.
+     */
     public String getRestockItem_itemQuantityField() {
         return restockItem_itemQuantityField.getText();
     }
-
+    /**
+     * Changes the quantity of items being used for restocking.
+     *
+     * @param quantity New Integer quanity of items for restocking.
+     */
     public void setRestockItem_itemQuantity(int quantity) {
         restockItem_itemQuantity.setText(String.valueOf(quantity) + "pcs");
     }
-
+    /**
+     * Starts the process of performing a slotDropDown when the
+     * corresponding action is taken.
+     *
+     * @param actn ActionListener for this method.
+     */
     public void setSlotDropDown(ActionListener actn) {
         ActionListener[] actns = slotDropDown.getActionListeners();
         if(actns.length > 1){
@@ -131,7 +173,12 @@ public class Maintenance_Menu {
         }
         slotDropDown.addActionListener(actn);
     }
-
+    /**
+     * Starts the process of adding a button to the setRestock item
+     * menu when the corresponding action is taken.
+     *
+     * @param actn ActionListener for this method.
+     */
     public void setRestockItem_addButton(ActionListener actn) {
         ActionListener[] actns = restockItem_addButton.getActionListeners();
         if(actns.length > 1){
@@ -139,14 +186,24 @@ public class Maintenance_Menu {
         }
         restockItem_addButton.addActionListener(actn);
     }
-
+    /**
+     * Changes the set of Denominations for the DropDown
+     * given a string array of new denoms.
+     *
+     * @param str set of new denominations as a string array.
+     */
     public void setDenomsDropDown(String[] str) {
         restockDenomsFrame.remove(denomsDropDown);
         denomsDropDown = new JComboBox<String>(str);
         setupRestockDenoms();
 
     }
-
+    /**
+     * Changes the set of Denominations for the DropDown
+     * given an input from an ActionListener.
+     *
+     * @param actn ActionListener for this method.
+     */
     public void setDenomsDropDown(ActionListener actn) {
         ActionListener[] num = denomsDropDown.getActionListeners();
         if(num.length > 0){
@@ -154,15 +211,30 @@ public class Maintenance_Menu {
         }
         denomsDropDown.addActionListener(actn);
     }
-
+    /**
+     * Allows other classes to access the index of the
+     * DenomsDropDown.
+     *
+     * @return integer index of DenomsDropDown
+     */
     public int getDenomsDropDown() {
         return denomsDropDown.getSelectedIndex();
     }
-
+    /**
+     * Changes the quantity of Denoms during restocking given a
+     * string input
+     *
+     * @param quantity New quantity of denoms for RestockDenoms.
+     */
     public void setRestockDenoms_denomQuantity(String quantity) {
         restockDenoms_denomQuantity.setText("Stored: " + quantity);
     }
-
+    /**
+     * Changes the quantity of Denoms during restocking given an
+     * ActionListener.
+     *
+     * @param actn ActionListener for the method.
+     */
     public void setRestockDenomsButton(ActionListener actn){
         ActionListener[] num = restockDenomsButton.getActionListeners();
         if(num.length > 1){
@@ -170,11 +242,18 @@ public class Maintenance_Menu {
         }
         restockDenomsButton.addActionListener(actn);
     }
-
+    /**
+     * Allows other classes to access the quantity field of
+     * RestockDenoms.
+     *
+     * @return The string variable of the quantity field.
+    */
     public String getRestockDenom_quantityField() {
         return restockDenom_quantityField.getText();
     }
-
+    /**
+     * Sets up the elements for the mainFrame of the Maintenance_Menu.
+     */
     public void setupElements(){
         mainFrame.setTitle("Maintenance Features");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -216,7 +295,9 @@ public class Maintenance_Menu {
         setupRestockDenoms();
 
     }
-
+    /**
+     * Sets up the RestockDenoms menu for Maintenance_Menu.
+     */
     private void setupRestockDenoms(){
         restockDenomsFrame.setTitle("Restock Denominations");
         restockDenomsFrame.setLayout(new MigLayout("wrap 2"));
@@ -231,7 +312,9 @@ public class Maintenance_Menu {
 
         restockDenomsFrame.pack();
     }
-
+    /**
+     * Sets up the AddItem menu for Maintenance_Menu.
+     */
     private void setupAddItem(){
         addItemFrame.setTitle("Add Item");
         addItemFrame.add(addItem_itemNameLabel);
@@ -245,7 +328,9 @@ public class Maintenance_Menu {
 
         addItemFrame.pack();
     }
-
+    /**
+     * Sets up the RestockItem menu for Maintenance_Menu.
+     */
     private void setupRestockItem(){
         restockItemFrame.setTitle("Restock Item");
         restockItemFrame.add(slotDropDown, "span 2");
@@ -261,6 +346,13 @@ public class Maintenance_Menu {
 
 
     }
+
+    /**
+     * Displays the empty machine window
+     *
+     * @param returned information about the denomination counts
+     * @param total information about the total amount of money emptied
+     */
     public void displayEmpty(ArrayList<String> returned, double total){
         JFrame moneyReturned = new JFrame();
         moneyReturned.setTitle("Money Returned");
@@ -285,7 +377,14 @@ public class Maintenance_Menu {
 
 
     }
-
+    /**
+     * Displays the Stock of previous transactions based on the items
+     * that are sold.
+     *
+     * @param sold      List of all items sold from previous transacitons.
+     * @param revenue   Overall revenue from past transactions.
+     * @param calories  Overall calories from items of past transactions.
+     */
     public void displayStock(ArrayList<String> sold, double revenue, double calories){
         JFrame pastTransacts = new JFrame();
         pastTransacts.setTitle("Stats since last re-stock");
@@ -310,6 +409,9 @@ public class Maintenance_Menu {
 
 
     }
+    /**
+     * Sets up the buttons and ActionListeners for the various menus in Maintenance_Menu.
+     */
     private void setupButtons(){
         addItemButton.addActionListener(new ActionListener() {
             @Override
@@ -392,6 +494,13 @@ public class Maintenance_Menu {
         });
 
     }
+
+    /**
+     * Sets up the current menu being opened to be visible
+     * based on the menu selected.
+     *
+     * @param menu Integer value of menu being selected.
+     */
     public void setMenu(int menu){
 
         switch(menu){
@@ -428,7 +537,11 @@ public class Maintenance_Menu {
             }
         }
     }
-
+    /**
+     * Adds an AddItemButton and their corresponding ActionListeners.
+     *
+     * @param actn The ActionListener for this method.
+     */
     public void setAddAddItemButton(ActionListener actn) {
         ActionListener[] actnlstnrs;
         actnlstnrs = addAddItemButton.getActionListeners();
@@ -437,19 +550,35 @@ public class Maintenance_Menu {
         }
         addAddItemButton.addActionListener(actn);
     }
-
+    /**
+     * Sets up an exit button and its ActionListener.
+     *
+     * @param actn The ActionListener for this method.
+     */
     public void setExitButton(ActionListener actn) {
         exitButton.addActionListener(actn);
     }
-
+    /**
+     * Allows other classes to access the itemNameField.
+     *
+     * @return String variable of the itemNameField.
+     */
     public String getAddItem_itemNameField() {
         return addItem_itemNameField.getText();
     }
-
+    /**
+     * Allows other classes to access the itemCaloriesField.
+     *
+     * @return String variable of the itemCaloriesField.
+     */
     public String getAddItem_itemCaloriesField() {
         return addItem_itemCaloriesField.getText();
     }
-
+    /**
+     * Allows other classes to access the itemPriceField.
+     *
+     * @return String variable of the itemPriceField.
+     */
     public String getAddItem_itemPriceField() {
         return addItem_itemPriceField.getText();
     }
@@ -462,7 +591,12 @@ public class Maintenance_Menu {
         }
         restockDenoms_addButton.addActionListener(actn);
     }
-
+    /**
+     * Sets up buttons and their ActionListeners for the RestockDenoms
+     * menu.
+     *
+     * @param actn The ActionListener for this method.
+     */
     public void setEmptyMachineButton(ActionListener actn) {
         ActionListener[] actnlstnrs;
         actnlstnrs = emptyMachineButton.getActionListeners();
@@ -471,7 +605,9 @@ public class Maintenance_Menu {
         }
         emptyMachineButton.addActionListener(actn);
     }
-
+    /**
+     * Clears and Resets all itemFields in Maintenance_Menu
+     */
     public void resetFields(){
         addItem_itemCaloriesField.setText("");
         addItem_itemNameField.setText("");

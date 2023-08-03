@@ -216,6 +216,13 @@ public class VendingMachine_Menu extends JFrame {
 
     }
 
+    /**
+     *
+     * @param ordered
+     * @param summary
+     * @param change
+     * @param messages
+     */
     public void showReceipt(ArrayList<String> ordered, ArrayList<Double> summary, ArrayList<String> change, ArrayList<String> messages){
         JFrame receipt = new JFrame();
         JPanel orders = new JPanel(new MigLayout("wrap 2, fillx", "[]20[]"));

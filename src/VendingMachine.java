@@ -96,9 +96,8 @@ public class VendingMachine {
      * its corresponding slot.
      *
      * @param adjustments   The values for the new stock of items being added.
-     * @param previousStock The values for the old stock of items that are
-     *                      being added by the new stock.
-     * @return
+     *
+     * @return Whether the algorithm successfully restocked the items
      */
     public boolean restockItem(HashMap<Integer, Integer> adjustments) { //change to slot number
         boolean allGood = true;
@@ -243,9 +242,7 @@ public class VendingMachine {
         if (followThrough && possible) {
             coinBank.checkout(currentTransaction);
             outputMessage.addAll(currentTransaction.getMessages());
-            for(String str: outputMessage){
-                System.out.println(str);
-            }
+
             currentTransaction.transferDetails(receipt);
             updateInventoryCount(currentTransaction.getCartedItems());
 
@@ -263,7 +260,6 @@ public class VendingMachine {
         } else if (followThrough && !possible) {
             outputMessage.add("Machine does not have the appropriate change for this order");
         }
-        System.out.println(String.valueOf(possible));
 
 
         return possible;

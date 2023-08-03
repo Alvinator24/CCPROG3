@@ -3,31 +3,37 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * This class represents the main menu and vending machine creation view in a vending machine GUI.
+ */
 public class View_MainMenu {
 
     public static final int MAIN_MENU = 0;
     public static final int CREATE_MENU = 1;
     //Main Menu
-    private JFrame frame_MainMenu;
-    private JLabel label_Title;
-    private JButton button_Test;
-    private JButton button_Create;
+    private final JFrame frame_MainMenu;
+    private final JLabel label_Title;
+    private final JButton button_Test;
+    private final JButton button_Create;
     private GridBagConstraints gbc;
 
 
     //Create Menu
-    private JFrame frame_CreateVending;
-    private JLabel label_VendingName;
-    private JLabel label_VendingSlotLimit;
-    private JLabel label_VendingItemLimit;
-    private JLabel label_Errors;
-    private JTextField textField_VendingName;
-    private JTextField textField_VendingSlotLimit;
-    private JTextField textField_VendingItemLimit;
-    private JButton button_CreateVending;
-    private JButton button_ExitVending;
+    private final JFrame frame_CreateVending;
+    private final JLabel label_VendingName;
+    private final JLabel label_VendingSlotLimit;
+    private final JLabel label_VendingItemLimit;
+    private final JLabel label_Errors;
+    private final JTextField textField_VendingName;
+    private final JTextField textField_VendingSlotLimit;
+    private final JTextField textField_VendingItemLimit;
+    private final JButton button_CreateVending;
+    private final JButton button_ExitVending;
 
-
+    /**
+     * Constructs a new View_MainMenu instance, initializes the main menu,
+     * and creates vending menu components.
+     */
     View_MainMenu(){
        frame_MainMenu = new JFrame("Main Menu");
        label_Title = new JLabel("Vending Machine Tester");
@@ -48,12 +54,18 @@ public class View_MainMenu {
        gbc = new GridBagConstraints();
     }
 
+    /**
+     * Calls the methods that set up the view elements of the main menu
+     * and the vending machine creation menu.
+     */
     public void setupViewElements(){
         setup_MainMenu();
         setup_CreateVendingMenu();
 
     }
-
+    /**
+     * Sets up the view elements of the vending machine creation menu.
+     */
     private void setup_CreateVendingMenu(){
         frame_CreateVending.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame_CreateVending.setLayout(new GridBagLayout());
@@ -118,31 +130,59 @@ public class View_MainMenu {
             }
         });
 
-
-
-
-
     }
+    /**
+     * Creates the ActionListener for the "Create Vending Machine" button
+     * in the vending machine creation menu.
+     *
+     * @param actn  The ActionListener to be set for the button.
+     */
     public void setButton_CreateVending(ActionListener actn){
         button_CreateVending.addActionListener(actn);
     }
+    /**
+     * Retrieves the text entered in the "Vending Name" text field
+     * of the vending machine creation menu.
+     *
+     * @return  The text entered in the "Vending Name" text field.
+     */
     public String getTextField_VendingName(){
         return textField_VendingName.getText();
     }
 
+    /**
+     * Accesses the text entered in the "Slot Limit" text field
+     * of the vending machine creation menu.
+     *
+     * @return  The text entered in the "Slot Limit" text field.
+     */
     public String getTextField_VendingSlotLimit() {
         return textField_VendingSlotLimit.getText();
     }
 
+    /**
+     * Retrieves the text entered in the "Item Limit" text field
+     * of the vending machine creation menu.
+     *
+     * @return  The text entered in the "Item Limit" text field.
+     */
     public String getTextField_VendingItemLimit() {
         return textField_VendingItemLimit.getText();
     }
 
+    /**
+     * Sets the text of the "Errors" label in either the main menu
+     * or the vending machine creation menu.
+     *
+     * @param string    The error message to be displayed.
+     */
     public void setLabel_Errors(String string){
         label_Errors.setText(string);
     }
 
-
+    /**
+     * Sets up the view elements of the main menu.
+     */
     private void setup_MainMenu(){
         frame_MainMenu.setVisible(true);
         frame_MainMenu.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -176,11 +216,22 @@ public class View_MainMenu {
         });
     }
 
-
+    /**
+     * Sets the ActionListener for the "Test Vending Machine" button
+     * in the main menu.
+     *
+     * @param actionListener    The ActionListener to be set for the button.
+     */
     public void setButton_Test(ActionListener actionListener) {
         button_Test.addActionListener(actionListener);
     }
 
+    /**
+     * Sets the view menu to be displayed based on the provided menu option.
+     *
+     * @param menu  The menu option to be displayed
+     *              (MAIN_MENU, CREATE_MENU, or 3 for hiding all menus).
+     */
     public void setMenu(int menu){
         clearErrorLabel();
         switch (menu) {
@@ -211,10 +262,18 @@ public class View_MainMenu {
         }
     }
 
+    /**
+     * Clears the text of the "Errors" label in either the main menu
+     * or the vending machine creation menu.
+     */
     public void clearErrorLabel(){
         label_Errors.setText("");
     }
 
+    /**
+     * Resets the labels in the vending machine creation menu to
+     * their default values.
+     */
     public void resetCreateVendingLabels(){
         textField_VendingName.setText("");
         textField_VendingSlotLimit.setText("8");

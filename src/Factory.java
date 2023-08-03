@@ -6,6 +6,10 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * This class represents a factory for managing the production and maintenance of
+ * Vending Machines and their menus.
+ */
 public class Factory {
 
     ArrayList<Denomination> denomList;
@@ -16,6 +20,13 @@ public class Factory {
     VendingMachine_Menu vendingMenu;
     Maintenance_Menu maintenanceMenu;
 
+    /**
+     * Constructs a new Factory of Vending Machines which accept a given
+     * list of denominations of a currency.
+     *
+     * @param denomList The list of denominations of the currency
+     *                  supported by the factory.
+     */
      Factory(ArrayList<Denomination> denomList){
         this.denomList = denomList;
         this.vendingList = new ArrayList<VendingMachine>();
@@ -26,6 +37,9 @@ public class Factory {
         startFactory();
     }
 
+    /**
+     * Method to initiate the start of the Vending Machine production process.
+     */
     private void startFactory(){
          createPreSetVendingMachines();
          mainMenu.setupViewElements();
@@ -37,6 +51,9 @@ public class Factory {
 
     }
 
+    /**
+     * Method to set up the logic behind the buttons for the GUI of the Factory.
+     */
     private void setupButtonLogic(){
          //mainMenu buttons
          mainMenu.setButton_CreateVending(new ActionListener() {
@@ -113,6 +130,12 @@ public class Factory {
 
     }
 
+    /**
+     * Sets the logic needed for GUI elements unique to
+     * respective vending machines
+     *
+     * @param index Index of the Vending Machine from the Factory.
+     */
     private void setVending(int index){
          vendingMenu.refreshSlotPanel();
          resetSlotView();
@@ -198,7 +221,6 @@ public class Factory {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int slotIndex = maintenanceMenu.getSlotDropDown();
-                System.out.println("UO" + slotIndex);
                 maintenanceMenu.setRestockItem_itemQuantity(vendingList.get(index).getItemSlots().get(slotIndex).getQuantity());
                 maintenanceMenu.setRestockItem_Price(vendingList.get(index).getItemSlots().get(slotIndex).getPrice());
             }
@@ -211,7 +233,6 @@ public class Factory {
                 HashMap<Integer, Integer> tobeAdded = new HashMap<Integer, Integer>();
                 int slotIndex = maintenanceMenu.getSlotDropDown();
                 int amount = Integer.parseInt(maintenanceMenu.getRestockItem_itemQuantityField());
-                System.out.println(amount);
                 double price = Double.parseDouble(maintenanceMenu.getRestockItem_Price());
 
                 for(int i = 0; i < vendingList.get(index).getItemSlots().size(); ++i){
@@ -319,6 +340,11 @@ public class Factory {
 
     }
 
+    /**
+     * Sets up all the logic needed for transaction checkout
+     *
+     * @param vendingIndex  The index of the vending machine.
+     */
     public void checkoutItems(int vendingIndex){
          ArrayList<String> outputMessages = new ArrayList<String>();
          HashMap<Denomination, Integer> change = new HashMap<Denomination, Integer>();
@@ -358,11 +384,25 @@ public class Factory {
         vendingMenu.showReceipt(str_Items, summary, str_Change, outputMessages);
 
     }
+    /**
+     * Updates the displayed carted items and transaction details
+     * for all slots of a specific vending machine.
+     *
+     * @param vendingIndex  The index of the vending machine.
+     */
     public void updatePurchased(int vendingIndex){
          for(int i = 0; i < slotViews.size(); ++i){
              updatePurchased(i, vendingIndex);
          }
     }
+
+    /**
+     * Updates the displayed carted items and transaction details
+     * for a specific slot in a vending machine.
+     *
+     * @param index         The index of the slot.
+     * @param vendingIndex  The index of the vending machine.
+     */
     public void updatePurchased(int index, int vendingIndex){
          slotViews.get(index).setQuantity(vendingList.get(vendingIndex).getCurrentTransaction().getCartedItems().get(index), vendingList.get(vendingIndex).getItemSlots().get(index).getQuantity());
 
@@ -400,6 +440,9 @@ public class Factory {
          vendingMenu.updateTransaction(ordered, total);
     }
 
+    /**
+     * Updates the vending machine list dropdown in the vending machine menu.
+     */
     public void updateListDropDown(){
          ArrayList<String> vendingNames = new ArrayList<String>();
          for(VendingMachine vending: vendingList){
@@ -407,9 +450,16 @@ public class Factory {
          }
          vendingMenu.setVendingDropDown(vendingNames);
     }
+    /**
+     * Resets the slot GUIs of a Vending Machine
+     */
     private void resetSlotView(){
          slotViews = new ArrayList<SlotGui>();
     }
+
+    /**
+     * Creates a pre-made set of Vending Machines for testing pursposes.
+     */
     private void createPreSetVendingMachines(){
         vendingList.add(new VendingMachine("Fruit Machine", 8, 10, denomList));
         VendingMachine regular = vendingList.get(0);

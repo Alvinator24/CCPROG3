@@ -145,7 +145,6 @@ public class CoinDispenser {
                 --denomCounter;
             }
             else{
-                System.out.println("not enough money inserted");
                 enoughChange = false;
                 possibleChange = null;
             }
