@@ -583,6 +583,11 @@ public class Maintenance_Menu {
         return addItem_itemPriceField.getText();
     }
 
+    /**
+     * Sets the action listener for the add button in
+     * the Restock Denominations menu
+     * @param actn the actionlistener to be added
+     */
     public void setRestockDenoms_addButton(ActionListener actn) {
         ActionListener[] actnlstnrs;
         actnlstnrs = restockDenoms_addButton.getActionListeners();

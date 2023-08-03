@@ -1,7 +1,11 @@
 
 import java.util.ArrayList;
 
+/**
+ * Starts the whole program
+ */
 public class Driver {
+
     public static void main(String[] args) {
 
         ArrayList<Denomination> denoms = new ArrayList<Denomination>();

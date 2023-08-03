@@ -1,4 +1,3 @@
-import net.miginfocom.layout.Grid;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -53,7 +52,7 @@ public class VendingMachine_Menu extends JFrame {
         for(Denomination denom : denomList){
             denomsList.add(String.valueOf(denom.getValue()));
         }
-        String denomArr[] = denomsList.toArray(new String[denomList.size()]);
+        String[] denomArr = denomsList.toArray(new String[denomList.size()]);
 
         denomDropDown = new JComboBox(denomArr);
         vendingDropDown = new JComboBox();
@@ -214,8 +213,7 @@ public class VendingMachine_Menu extends JFrame {
         transactionSummary.setVisible(true);
         transactionPanel.add(transactionSummary, "dock south,push");
         SwingUtilities.updateComponentTreeUI(this);
-        //setVisible(false);
-        //setVisible(true);
+
     }
 
     /**

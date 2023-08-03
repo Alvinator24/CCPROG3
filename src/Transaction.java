@@ -167,7 +167,7 @@ public class Transaction {
     /**
      * Allows other classes to access the total calories
      * of all items in the user's cart.
-     *
+     * @param receipt the receipt to receive the information
      */
 
     public void transferDetails(Transaction receipt) {
@@ -177,7 +177,10 @@ public class Transaction {
         receipt.setTotalPrice(getTotalPrice());
     }
 
-
+    /**
+     * Sets the carted items in the transaction
+     * @param cartedItems
+     */
     public void setCartedItems(HashMap<Integer, Integer> cartedItems) {
         this.cartedItems = cartedItems;
     }
